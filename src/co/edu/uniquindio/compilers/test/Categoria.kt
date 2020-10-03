@@ -1,0 +1,14 @@
+package co.edu.uniquindio.compilers.test
+
+enum class Categoria {
+    ENTERO,
+    DECIMAL,
+    IDENTIFICADOR,
+    OPERADOR_ARITMETICO,
+    OPERADOR_LOGICO,
+    PARENTESIS_IZQUIERDO,
+    PARENTESIS_DERECHO,
+    CORCHETES,
+    OPERADORES_RELACIONALES,
+    DESCONOCIDO
+}
