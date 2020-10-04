@@ -1,6 +1,6 @@
 package co.edu.uniquindio.compilers.test
 
-enum class Categoria {
+enum class Category {
     ENTERO,
     DECIMAL,
     IDENTIFICADOR,

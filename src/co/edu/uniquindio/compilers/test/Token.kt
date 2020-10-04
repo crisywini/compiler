@@ -1,7 +1,7 @@
 package co.edu.uniquindio.compilers.test
 
-class Token (var lexema:String, var categoria:Categoria, var fila:Int, var columna:Int){
+class Token (var lexema:String, var category:Category, var row:Int, var column:Int){
     override fun toString(): String {
-        return "Token(lexema='$lexema', categoria=$categoria, fila=$fila, columna=$columna)"
+        return "Token(lexema='$lexema', categoria=$category, fila=$row, columna=$column)"
     }
 }
