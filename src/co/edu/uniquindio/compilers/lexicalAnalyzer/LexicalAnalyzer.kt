@@ -1,4 +1,4 @@
-package co.edu.uniquindio.compilers.test
+package co.edu.uniquindio.compilers.lexicalAnalyzer
 
 class LexicalAnalyzer (var sourceCode:String  ){
     var actualPosition = 0

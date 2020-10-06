@@ -1,4 +1,4 @@
-package co.edu.uniquindio.compilers.test
+package co.edu.uniquindio.compilers.lexicalAnalyzer
 
 enum class Category {
     ENTERO,
