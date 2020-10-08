@@ -16,8 +16,11 @@ class LexicalAnalyzer (var sourceCode:String  ){
             }
             if(isInteger()) continue
             if(isDecimal()) continue
-
+            if(isString()) continue
             if(isIdentifier()) continue
+            if(isArithmeticOperator()) continue
+            if(isIncrementOperator()) continue
+            if(isDecrementOperator()) continue
             storeToken(""+currentCharacter, Category.DESCONOCIDO, currentRow, currentColumn)
             setNextCharacter()
         }
@@ -59,12 +62,97 @@ class LexicalAnalyzer (var sourceCode:String  ){
         }
         return false
     }
-    fun doBackTracking(posicionInicial:Int, filaInicial:Int, columnaInicial:Int){
-        actualPosition = posicionInicial
-        currentRow = filaInicial
-        currentColumn = columnaInicial
+    fun doBackTracking(initialPosition:Int, initialRow:Int, initialColumn:Int){
+        actualPosition = initialPosition
+        currentRow = initialRow
+        currentColumn = initialColumn
 
         currentCharacter = sourceCode[actualPosition]
+    }
+
+    fun isString():Boolean{
+
+        if(currentCharacter=='('){
+            var lexema = ""
+            var initialRow = currentRow
+            var initialColumn = currentColumn
+            var initialPosition = actualPosition
+            lexema += currentCharacter
+            setNextCharacter()//Cambiar nombre a actualizar caracter
+            while(currentCharacter!=')'){
+                lexema += currentCharacter
+                setNextCharacter()//Cambiar nombre a actualizar caracter
+            }
+            lexema += currentCharacter
+            setNextCharacter()
+            storeToken(lexema, Category.CADENA_CARACTERES, initialRow, initialColumn)
+            return true
+        }
+        return false
+    }
+
+    fun isArithmeticOperator():Boolean{
+        if(currentCharacter=='*'||currentCharacter=='\''||currentCharacter=='.'||currentCharacter=='-'||currentCharacter=='&'){
+            var lexema = ""
+            var initialRow = currentRow
+            var initialColumn = currentColumn
+            var initialPosition = actualPosition
+            var currentCharacterCopy = currentCharacter
+            lexema += currentCharacter
+            setNextCharacter()//Cambiar nombre a actualizar caracter
+            if(currentCharacterCopy=='*'&&currentCharacter=='*'||currentCharacterCopy=='\''&&currentCharacter=='\''||currentCharacter==':'){
+                doBackTracking(initialPosition, initialRow, initialColumn)
+                return false
+            }
+            storeToken(lexema, Category.OPERADOR_ARITMETICO, initialRow, initialColumn)
+            return true
+        }
+        return false
+    }
+    fun isIncrementOperator():Boolean{
+        if(currentCharacter=='*'){
+
+            var lexema = ""
+            var initialRow = currentRow
+            var initialColumn = currentColumn
+            var initialPosition = actualPosition
+            lexema += currentCharacter
+            setNextCharacter()//Cambiar nombre a actualizar caracter
+            if(currentCharacter=='*'){
+                lexema += currentCharacter
+                setNextCharacter()//Cambiar nombre a actualizar caracter
+
+            }else if(currentCharacter==':'){
+                doBackTracking(initialPosition, initialRow, initialColumn)
+                return false
+            }
+            storeToken(lexema, Category.OPERADOR_INCREMENTO, initialRow, initialColumn)
+            return true
+        }
+        return false
+    }
+
+
+    fun isDecrementOperator():Boolean{
+        if(currentCharacter=='\''){
+
+            var lexema = ""
+            var initialRow = currentRow
+            var initialColumn = currentColumn
+            var initialPosition = actualPosition
+            lexema += currentCharacter
+            setNextCharacter()//Cambiar nombre a actualizar caracter
+            if(currentCharacter=='\''){
+                lexema += currentCharacter
+                setNextCharacter()//Cambiar nombre a actualizar caracter
+            }else if(currentCharacter==':'){
+                doBackTracking(initialPosition, initialRow, initialColumn)
+                return false
+            }
+            storeToken(lexema, Category.OPERADOR_DECREMENTO, initialRow, initialColumn)
+            return true
+        }
+        return false
     }
 
 
@@ -95,6 +183,7 @@ class LexicalAnalyzer (var sourceCode:String  ){
         return false
     }
 
+
     fun isIdentifier():Boolean{
         if(currentCharacter.isLetter()||currentCharacter=='$'||currentCharacter=='_'){
             var lexema = ""
@@ -113,6 +202,7 @@ class LexicalAnalyzer (var sourceCode:String  ){
         }
         return false
     }
+
 
     /**
      * Único método que debe hacer:
