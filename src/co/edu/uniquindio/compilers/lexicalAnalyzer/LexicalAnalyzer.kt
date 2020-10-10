@@ -826,7 +826,6 @@ class LexicalAnalyzer(var sourceCode: String) {
     fun isColon(): Boolean {
 
         if (currentCharacter == ';') {
-
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
@@ -834,14 +833,8 @@ class LexicalAnalyzer(var sourceCode: String) {
             lexema += currentCharacter
             setNextCharacter()
 
-            if (currentCharacter == ':') {
-                lexema += currentCharacter
-                setNextCharacter()
-                storeToken(lexema, Category.DOS_PUNTOS, initialRow, initialColumn)
-                return true
-            } else {
-                doBackTracking(actual,initialRow,initialColumn)
-            }
+            storeToken(lexema, Category.DOS_PUNTOS, initialRow, initialColumn)
+            return true
         }
         return false
     }
