@@ -62,8 +62,14 @@ class LexicalAnalyzer(var sourceCode: String) {
                     lexema += currentCharacter
                     setNextCharacter()
 
-
+                    }
                 }
+                while (currentCharacter.isDigit()) {
+                    lexema += currentCharacter
+                    setNextCharacter()
+                }
+                storeToken(lexema, Category.DECIMAL, initialRow, initialColumn)
+                return true
             }
             while (currentCharacter.isDigit()) {
                 lexema += currentCharacter
