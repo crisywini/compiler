@@ -21,12 +21,14 @@ class LexicalAnalyzer (var sourceCode:String  ){
             //if(isInteger()) continue
             //if(isDecimal()) continue
             if(isString()) continue
-            if(isIdentifier()) continue
+            //if(isIdentifier()) continue
             if(isArithmeticOperator()) continue
             if(isIncrementOperator()) continue
             if(isDecrementOperator()) continue
             if(isAssignmentOperator()) continue
             if(isRelationalOperator()) continue
+            if(isLogicalOperator()) continue
+
             storeToken(""+currentCharacter, Category.DESCONOCIDO, currentRow, currentColumn)
             setNextCharacter()
         }
@@ -246,6 +248,40 @@ class LexicalAnalyzer (var sourceCode:String  ){
         return false
     }
 
+    /**
+     * This method allows to verify the logical operators
+     */
+    fun isLogicalOperator():Boolean{
+        if(currentCharacter=='a'||currentCharacter=='o'){
+            var lexema = ""
+            var initialRow = currentRow
+            var initialColumn = currentColumn
+            var initialPosition = actualPosition
+            var currentCharacterCopy = currentCharacter
+            lexema += currentCharacter
+            setNextCharacter()//Cambiar nombre a actualizar caracter
+            if((currentCharacterCopy=='a'&&currentCharacter=='n')){
+                lexema+=currentCharacter
+                setNextCharacter()
+                if(currentCharacter=='d'){
+                    lexema += currentCharacter
+                    setNextCharacter()
+                }else{
+                    doBackTracking(initialPosition, initialRow, initialColumn)
+                    return false
+                }
+            }else if(currentCharacterCopy=='o'&&currentCharacter=='r'){
+                lexema+=currentCharacter
+                setNextCharacter()
+            }else{
+                doBackTracking(initialPosition,initialRow, initialColumn)
+                return false
+            }
+            storeToken(lexema, Category.OPERADOR_LOGICO, initialRow, initialColumn)
+            return true
+        }
+        return false
+    }
 
 
     fun isInteger():Boolean{
