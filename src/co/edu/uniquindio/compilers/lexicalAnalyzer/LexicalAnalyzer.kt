@@ -39,6 +39,7 @@ class LexicalAnalyzer(var sourceCode: String) {
     }
 
     fun isDecimal(): Boolean {
+
         if (currentCharacter == '.' || currentCharacter.isDigit()) {
             var lexema = ""
             var initialRow = currentRow
@@ -70,7 +71,7 @@ class LexicalAnalyzer(var sourceCode: String) {
                 }
                 storeToken(lexema, Category.DECIMAL, initialRow, initialColumn)
                 return true
-            }
+
             while (currentCharacter.isDigit()) {
                 lexema += currentCharacter
                 setNextCharacter()
