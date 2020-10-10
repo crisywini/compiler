@@ -323,6 +323,7 @@ class LexicalAnalyzer(var sourceCode: String) {
             var initialRow = currentRow
             var initialColumn = currentColumn
             var actual = actualPosition
+            var count = 0
             lexema += currentCharacter
             setNextCharacter()
 
@@ -330,7 +331,8 @@ class LexicalAnalyzer(var sourceCode: String) {
                 lexema += currentCharacter
                 setNextCharacter()
 
-                while (currentCharacter.isLetter() || currentCharacter.isDigit()) {
+                while ((currentCharacter.isLetter() || currentCharacter.isDigit()) && count <= 8) {
+                    count ++
                     lexema += currentCharacter
                     setNextCharacter()
                 }
