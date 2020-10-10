@@ -27,5 +27,4 @@ class App : Application(){
             launch(App::class.java)
         }
     }
-
 }
