@@ -1,5 +1,6 @@
 package co.edu.uniquindio.compilers.controller
 
+import co.edu.uniquindio.compilers.app.App
 import co.edu.uniquindio.compilers.lexicalAnalyzer.LexicalAnalyzer
 import co.edu.uniquindio.compilers.observables.TokenObservable
 import javafx.beans.property.SimpleStringProperty
@@ -10,6 +11,8 @@ import javafx.scene.control.TableView
 import javafx.scene.control.TextArea
 
 import javafx.scene.control.cell.PropertyValueFactory
+import javafx.scene.image.Image
+import javafx.scene.image.ImageView
 
 
 class InitViewController {
@@ -21,7 +24,7 @@ class InitViewController {
     @FXML lateinit var categoryTableColumn: TableColumn<TokenObservable, String>
     @FXML lateinit var rowTableColumn: TableColumn<TokenObservable, String>
     @FXML lateinit var columnTableColumn: TableColumn<TokenObservable, String>
-
+    @FXML lateinit var imageButton:ImageView
 
     @FXML
     fun analyze(event : ActionEvent){
@@ -42,8 +45,8 @@ class InitViewController {
 
 
     fun initizalize(){
-
         initTableView()
+        imageButton.image = Image(App::class.java.getResourceAsStream("/analyzer.png"))
     }
 
     private fun initTableView(){
