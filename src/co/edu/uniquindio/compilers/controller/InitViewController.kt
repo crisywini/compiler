@@ -3,7 +3,6 @@ package co.edu.uniquindio.compilers.controller
 import co.edu.uniquindio.compilers.app.App
 import co.edu.uniquindio.compilers.lexicalAnalyzer.LexicalAnalyzer
 import co.edu.uniquindio.compilers.observables.TokenObservable
-import javafx.beans.property.SimpleStringProperty
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.scene.control.TableColumn

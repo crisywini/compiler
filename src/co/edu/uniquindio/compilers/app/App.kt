@@ -1,12 +1,10 @@
 package co.edu.uniquindio.compilers.app
 
-import co.edu.uniquindio.compilers.controller.InitViewController
 import co.edu.uniquindio.compilers.controller.RootViewController
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
 import javafx.scene.Scene
-import javafx.scene.layout.AnchorPane
 import javafx.stage.Stage
 
 class App : Application(){
