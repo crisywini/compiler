@@ -259,6 +259,10 @@ class LexicalAnalyzer(var sourceCode: String) {
         }
         return false
     }
+
+    /**
+     * This method allows to verify the reserved words
+     */
     fun isReservedWord():Boolean{
         if(currentCharacter=='s'||currentCharacter=='t'
                 ||currentCharacter=='o'||currentCharacter=='l'
