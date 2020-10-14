@@ -1,6 +1,7 @@
 package co.edu.uniquindio.compilers.app
 
 import co.edu.uniquindio.compilers.controller.InitViewController
+import co.edu.uniquindio.compilers.controller.RootViewController
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
@@ -11,10 +12,10 @@ import javafx.stage.Stage
 class App : Application(){
 
     override fun start(primaryStage: Stage?) {
-        val loader = FXMLLoader(App::class.java.getResource("/InitView.fxml"))
+        val loader = FXMLLoader(App::class.java.getResource("/RootView.fxml"))
         val parent:Parent = loader.load()
-        val controller:InitViewController = loader.getController()
-        controller.initizalize()
+        val controller:RootViewController= loader.getController()
+        controller.showInitView()
         val scene = Scene(parent)
         //Operador para variables que pueden ser nulas
         primaryStage?.scene = scene
@@ -27,5 +28,4 @@ class App : Application(){
             launch(App::class.java)
         }
     }
-
 }
