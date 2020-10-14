@@ -18,8 +18,8 @@ class LexicalAnalyzer(var sourceCode: String) {
                 setNextCharacter()
                 continue
             }
-            //if(isInteger()) continue
-            //if(isDecimal()) continue
+            if(isInteger()) continue
+            if(isDecimal()) continue
             if(isString()) continue
             if (isIdentifier()) continue
             if (isArithmeticOperator()) continue
@@ -32,36 +32,48 @@ class LexicalAnalyzer(var sourceCode: String) {
             if (isDot()) continue
             if (isSeparator()) continue
             if(isLogicalOperator()) continue
+            if(isComment()) continue
+            if(isCharacter()) continue
+            if(isGrouper()) continue
 
             storeToken("" + currentCharacter, Category.DESCONOCIDO, currentRow, currentColumn)
             setNextCharacter()
         }
     }
 
+    /**
+     * this method allows to identify if it is a decimal number
+     */
     fun isDecimal(): Boolean {
 
-        if (currentCharacter == '.' || currentCharacter.isDigit()) {
+        if(currentCharacter == '$') {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
-            if (currentCharacter == '.') {
-                lexema += currentCharacter
-                setNextCharacter()
-                if (currentCharacter.isDigit()) {
-                    lexema += currentCharacter
-                    setNextCharacter()
-                }
-            } else {
-                lexema += currentCharacter
-                setNextCharacter()
-                while (currentCharacter.isDigit()) {
-                    lexema += currentCharacter
-                    setNextCharacter()
-                }
-                if (currentCharacter == '.') {
 
+            lexema += currentCharacter
+            setNextCharacter()
+
+            if (currentCharacter == ',' || currentCharacter.isDigit()) {
+
+                if (currentCharacter == ',') {
                     lexema += currentCharacter
                     setNextCharacter()
+                    if (currentCharacter.isDigit()) {
+                        lexema += currentCharacter
+                        setNextCharacter()
+                    }
+                } else {
+                    lexema += currentCharacter
+                    setNextCharacter()
+                    while (currentCharacter.isDigit()) {
+                        lexema += currentCharacter
+                        setNextCharacter()
+                    }
+                    if (currentCharacter == ',') {
+
+                        lexema += currentCharacter
+                        setNextCharacter()
 
                     }
                 }
@@ -69,15 +81,10 @@ class LexicalAnalyzer(var sourceCode: String) {
                     lexema += currentCharacter
                     setNextCharacter()
                 }
+
                 storeToken(lexema, Category.DECIMAL, initialRow, initialColumn)
                 return true
-
-            while (currentCharacter.isDigit()) {
-                lexema += currentCharacter
-                setNextCharacter()
             }
-            storeToken(lexema, Category.DECIMAL, initialRow, initialColumn)
-            return true
         }
         return false
     }
@@ -294,8 +301,11 @@ class LexicalAnalyzer(var sourceCode: String) {
         return false
     }
 
+    /**
+     * this method allows to identify if it is a whole number
+     */
     fun isInteger(): Boolean {
-        if (currentCharacter.isDigit()) {
+        if(currentCharacter == '#') {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
@@ -303,19 +313,23 @@ class LexicalAnalyzer(var sourceCode: String) {
 
             lexema += currentCharacter
             setNextCharacter()//Cambiar nombre a actualizar caracter
-            while (currentCharacter.isDigit()) {
+            if (currentCharacter.isDigit()) {
                 lexema += currentCharacter
-                setNextCharacter()//Cambiar nombre a actualizar caracter
+                setNextCharacter()
+                while (currentCharacter.isDigit()) {
+                    lexema += currentCharacter
+                    setNextCharacter()//Cambiar nombre a actualizar caracter
+                }
+
+                if (currentCharacter == ',') {
+                    doBackTracking(initialPosition, initialRow, initialColumn)
+                    return false
+                }
+
+
+                storeToken(lexema, Category.ENTERO, initialRow, initialColumn)
+                return true
             }
-
-            if (currentCharacter == '.') {
-                doBackTracking(initialPosition, initialRow, initialColumn)
-                return false
-            }
-
-
-            storeToken(lexema, Category.ENTERO, initialRow, initialColumn)
-            return true
         }
         //RI -> Rechazo Inmediato
         return false
@@ -422,6 +436,158 @@ class LexicalAnalyzer(var sourceCode: String) {
         }
         return false
     }
+
+    /**
+     * this method allows to identify comments
+     */
+    fun isComment(): Boolean {
+
+        if (currentCharacter == '[') {
+
+            var lexema = ""
+            var initialRow = currentRow
+            var initialColumn = currentColumn
+            var initialPosition = actualPosition
+            lexema += currentCharacter
+            setNextCharacter()//Cambiar nombre a actualizar caracter
+
+            if(currentCharacter == '['){
+            while (currentCharacter != '\n') {
+                lexema += currentCharacter
+                setNextCharacter()//Cambiar nombre a actualizar caracter
+            }
+            lexema += currentCharacter
+            setNextCharacter()
+            storeToken(lexema, Category.COMENTARIO, initialRow, initialColumn)
+            return true
+            }
+        }
+
+        if (currentCharacter == '^') {
+
+            var lexema = ""
+            var initialRow = currentRow
+            var initialColumn = currentColumn
+            var initialPosition = actualPosition
+            lexema += currentCharacter
+            setNextCharacter()//Cambiar nombre a actualizar caracter
+
+            while (currentCharacter != '^') {
+                lexema += currentCharacter
+                setNextCharacter()//Cambiar nombre a actualizar caracter
+            }
+            lexema += currentCharacter
+            setNextCharacter()
+            storeToken(lexema, Category.COMENTARIO, initialRow, initialColumn)
+            return true
+        }
+        return false
+    }
+
+
+    /**
+     * this method allows to identify if it is a character
+     */
+    fun isCharacter(): Boolean {
+
+        if (currentCharacter == '¿') {
+
+            var lexema = ""
+            var initialRow = currentRow
+            var initialColumn = currentColumn
+            var initialPosition = actualPosition
+            lexema += currentCharacter
+            setNextCharacter()//Cambiar nombre a actualizar caracter
+
+            if (currentCharacter !='?') {
+                lexema += currentCharacter
+                setNextCharacter()//Cambiar nombre a actualizar caracter
+            }
+            if(currentCharacter !='?') {
+                return false
+            }
+            lexema += currentCharacter
+            setNextCharacter()
+            storeToken(lexema, Category.CARACTER, initialRow, initialColumn)
+            return true
+
+        }
+        return false
+    }
+
+    /**
+     * this method identifies groupers
+     */
+    fun isGrouper(): Boolean {
+
+        if(currentCharacter == '|')
+        {
+                var lexema = ""
+                var initialRow = currentRow
+                var initialColumn = currentColumn
+                var actual = actualPosition
+                lexema += currentCharacter
+                setNextCharacter()
+
+                storeToken(lexema, Category.AGRUPADOR, initialRow, initialColumn)
+                return true
+
+        }
+        if(currentCharacter == '/')
+        {
+            var lexema = ""
+            var initialRow = currentRow
+            var initialColumn = currentColumn
+            var actual = actualPosition
+            lexema += currentCharacter
+            setNextCharacter()
+
+            storeToken(lexema, Category.AGRUPADOR, initialRow, initialColumn)
+            return true
+
+
+        }
+        if(currentCharacter == '<')
+        {
+            var lexema = ""
+            var initialRow = currentRow
+            var initialColumn = currentColumn
+            var actual = actualPosition
+            lexema += currentCharacter
+            setNextCharacter()
+
+            if (currentCharacter == ':' || currentCharacter == '-') {
+                doBackTracking(actual, initialRow, initialColumn)
+                return false
+            }
+
+            storeToken(lexema, Category.AGRUPADOR, initialRow, initialColumn)
+            return true
+
+
+        }
+        if(currentCharacter == '>')
+        {
+            var lexema = ""
+            var initialRow = currentRow
+            var initialColumn = currentColumn
+            var actual = actualPosition
+            lexema += currentCharacter
+            setNextCharacter()
+
+            if (currentCharacter == ':') {
+                doBackTracking(actual, initialRow, initialColumn)
+                return false
+            }
+
+            storeToken(lexema, Category.AGRUPADOR, initialRow, initialColumn)
+            return true
+
+
+        }
+        return false
+    }
+
 
     /**
      * This method allows to:
