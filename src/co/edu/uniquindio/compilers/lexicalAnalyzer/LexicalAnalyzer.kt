@@ -4,6 +4,7 @@ class LexicalAnalyzer(var sourceCode: String) {
     var actualPosition = 0
     var currentCharacter = sourceCode[0] //First token of the source code
     var tokenList = ArrayList<Token>()
+    var errorList = ArrayList<Error>()
     var endCode = 0.toChar()
     var currentRow = 0
     var currentColumn = 0
@@ -113,6 +114,16 @@ class LexicalAnalyzer(var sourceCode: String) {
             while (currentCharacter != ')') {
                 lexema += currentCharacter
                 setNextCharacter()//Cambiar nombre a actualizar caracter
+                if(currentCharacter =='°'){
+                    lexema += currentCharacter
+                    setNextCharacter()
+                    if(currentCharacter != 'n'&& currentCharacter != 't' && currentCharacter != 'b'
+                            &&currentCharacter != 'r'&&currentCharacter != '('||currentCharacter != ')'
+                            &&currentCharacter != '?'&&currentCharacter != '¿'){
+                        storeError(lexema, initialRow, initialColumn, ErrorCategory.ERROR_LEXICO)
+                        return true
+                    }
+                }
             }
             lexema += currentCharacter
             setNextCharacter()
@@ -1084,4 +1095,9 @@ class LexicalAnalyzer(var sourceCode: String) {
      * This method allows to fill the token list
      */
     fun storeToken(lexema: String, category: Category, row: Int, column: Int) = tokenList.add(Token(lexema, category, row, column))
+
+    /**
+     * This method allows to fill the error list
+     */
+    fun storeError(error: String, row: Int, column: Int, errorCategory: ErrorCategory) = errorList.add(Error(error, row, column, errorCategory))
 }

@@ -2,6 +2,7 @@ package co.edu.uniquindio.compilers.controller
 
 import co.edu.uniquindio.compilers.app.App
 import co.edu.uniquindio.compilers.lexicalAnalyzer.LexicalAnalyzer
+import co.edu.uniquindio.compilers.observables.ErrorObservable
 import co.edu.uniquindio.compilers.observables.TokenObservable
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
@@ -24,16 +25,22 @@ class InitViewController {
     @FXML lateinit var rowTableColumn: TableColumn<TokenObservable, String>
     @FXML lateinit var columnTableColumn: TableColumn<TokenObservable, String>
     @FXML lateinit var imageButton:ImageView
+    @FXML lateinit var errorsTableView: TableView<ErrorObservable>
+    @FXML lateinit var errorErrorTableColumn: TableColumn<ErrorObservable, String>
+    @FXML lateinit var categoryErrorTableColumn: TableColumn<ErrorObservable, String>
+    @FXML lateinit var rowErrorTableColumn: TableColumn<ErrorObservable, String>
+    @FXML lateinit var columnErrorTableColumn: TableColumn<ErrorObservable, String>
 
     @FXML
     fun analyze(event : ActionEvent){
         if(sourceCodeTextArea.length>0){
-            fillTableView()
+            val lexical = LexicalAnalyzer(sourceCodeTextArea.text)
+            lexical.analyze()
+            fillTokensTableView(lexical)
+            fillErrorsTableView(lexical)
         }
     }
-    private fun fillTableView(){
-        val lexical = LexicalAnalyzer(sourceCodeTextArea.text)
-        lexical.analyze()
+    private fun fillTokensTableView(lexical:LexicalAnalyzer){
         tokensTableView.items.clear()
         for(element in lexical.tokenList){
             tokensTableView.items.add(TokenObservable(element.lexema,element.category.toString()
@@ -41,17 +48,31 @@ class InitViewController {
         }
         tokensTableView.refresh()
     }
-
+    private fun fillErrorsTableView(lexical:LexicalAnalyzer){
+        errorsTableView.items.clear()
+        for(element in lexical.errorList){
+            errorsTableView.items.add(ErrorObservable(element.error, "".plus(element.row), "".plus(element.column)
+                    , element.errorCategory.toString()))
+        }
+        errorsTableView.refresh()
+    }
 
     fun initizalize(){
-        initTableView()
+        initTokensTableView()
+        initErrorsTableView()
         imageButton.image = Image(App::class.java.getResourceAsStream("/analyzer.png"))
     }
 
-    private fun initTableView(){
+    private fun initTokensTableView(){
         lexemaTableColumn.cellValueFactory = PropertyValueFactory<TokenObservable, String>("lexema")
         categoryTableColumn.cellValueFactory = PropertyValueFactory<TokenObservable, String>("category")
         rowTableColumn.cellValueFactory = PropertyValueFactory<TokenObservable, String>("row")
         columnTableColumn.cellValueFactory = PropertyValueFactory<TokenObservable, String>("column")
+    }
+    private fun initErrorsTableView(){
+        errorErrorTableColumn.cellValueFactory = PropertyValueFactory<ErrorObservable, String>("error")
+        categoryErrorTableColumn.cellValueFactory = PropertyValueFactory<ErrorObservable, String>("errorCategory")
+        rowErrorTableColumn.cellValueFactory = PropertyValueFactory<ErrorObservable, String>("row")
+        columnErrorTableColumn.cellValueFactory = PropertyValueFactory<ErrorObservable, String>("column")
     }
 }

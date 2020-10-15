@@ -23,6 +23,11 @@
             <Pane prefHeight="200.0" prefWidth="20.0" />
          </children>
       </HBox>
+       <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+           <children>
+               <Label text="Tokens/Errores" />
+           </children>
+       </HBox>
       <HBox alignment="CENTER" prefHeight="270.0" prefWidth="800.0" spacing="5.0" VBox.vgrow="ALWAYS">
          <children>
             <Pane prefHeight="282.0" prefWidth="119.0" />
@@ -38,6 +43,19 @@
                </columnResizePolicy>
             </TableView>
             <Pane prefHeight="200.0" prefWidth="119.0" />
+             <TableView fx:id="errorsTableView" prefHeight="100.0" prefWidth="758.0" HBox.hgrow="ALWAYS">
+                 <columns>
+                     <TableColumn fx:id="errorErrorTableColumn" prefWidth="148.0" text="Error" />
+                     <TableColumn fx:id="categoryErrorTableColumn" prefWidth="245.0" text="Categoria" />
+                     <TableColumn fx:id="rowErrorTableColumn" prefWidth="36.0" text="Fila" />
+                     <TableColumn fx:id="columnErrorTableColumn" prefWidth="79.0" text="Columna" />
+                 </columns>
+                 <columnResizePolicy>
+                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                 </columnResizePolicy>
+             </TableView>
+             <Pane prefHeight="200.0" prefWidth="119.0" />
+
          </children>
       </HBox>
    </children>
