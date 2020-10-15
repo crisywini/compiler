@@ -102,6 +102,9 @@ class LexicalAnalyzer(var sourceCode: String) {
         currentCharacter = sourceCode[actualPosition]
     }
 
+    /**
+     * This method allows to verify the String
+     */
     fun isString(): Boolean {
 
         if (currentCharacter == '(') {
