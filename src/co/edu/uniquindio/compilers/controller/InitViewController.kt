@@ -14,10 +14,17 @@ import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 
-
+/**
+ *
+ * Init view controller Class
+ * @author Cristian Giovanny Sánchez Pineda
+ * @author Anjully Tatiana Mora Acosta
+ * @author Luisa Fernanda Cotte Sánchez
+ * @version 1.0
+ *
+ */
 class InitViewController {
 
-    //Relajese que nosotros vamos a inicializar esa variable en algún momento
     @FXML lateinit var sourceCodeTextArea: TextArea
     @FXML lateinit var tokensTableView: TableView<TokenObservable>
     @FXML lateinit var lexemaTableColumn: TableColumn<TokenObservable, String>
@@ -40,6 +47,10 @@ class InitViewController {
             fillErrorsTableView(lexical)
         }
     }
+
+    /**
+     * fill Tokens Table View method
+     */
     private fun fillTokensTableView(lexical:LexicalAnalyzer){
         tokensTableView.items.clear()
         for(element in lexical.tokenList){
@@ -48,6 +59,10 @@ class InitViewController {
         }
         tokensTableView.refresh()
     }
+
+    /**
+     * Fill Errors Table View method
+     */
     private fun fillErrorsTableView(lexical:LexicalAnalyzer){
         errorsTableView.items.clear()
         for(element in lexical.errorList){
@@ -57,18 +72,28 @@ class InitViewController {
         errorsTableView.refresh()
     }
 
+    /**
+     * Initizalize method
+     */
     fun initizalize(){
         initTokensTableView()
         initErrorsTableView()
         imageButton.image = Image(App::class.java.getResourceAsStream("/analyzer.png"))
     }
 
+    /**
+     * Init Tokens Table View method
+     */
     private fun initTokensTableView(){
         lexemaTableColumn.cellValueFactory = PropertyValueFactory<TokenObservable, String>("lexema")
         categoryTableColumn.cellValueFactory = PropertyValueFactory<TokenObservable, String>("category")
         rowTableColumn.cellValueFactory = PropertyValueFactory<TokenObservable, String>("row")
         columnTableColumn.cellValueFactory = PropertyValueFactory<TokenObservable, String>("column")
     }
+
+    /**
+     * Init Errors Table View method
+     */
     private fun initErrorsTableView(){
         errorErrorTableColumn.cellValueFactory = PropertyValueFactory<ErrorObservable, String>("error")
         categoryErrorTableColumn.cellValueFactory = PropertyValueFactory<ErrorObservable, String>("errorCategory")

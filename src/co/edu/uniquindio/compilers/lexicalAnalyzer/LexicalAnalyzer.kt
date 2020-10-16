@@ -1,5 +1,14 @@
 package co.edu.uniquindio.compilers.lexicalAnalyzer
 
+/**
+ *
+ * Lexical Analyzer class
+ * @author Cristian Giovanny Sánchez Pineda
+ * @author Anjully Tatiana Mora Acosta
+ * @author Luisa Fernanda Cotte Sánchez
+ * @version 1.0
+ *
+ */
 class LexicalAnalyzer(var sourceCode: String) {
     var actualPosition = 0
     var currentCharacter = sourceCode[0] //First token of the source code
@@ -19,9 +28,9 @@ class LexicalAnalyzer(var sourceCode: String) {
                 setNextCharacter()
                 continue
             }
-            if(isInteger()) continue
-            if(isDecimal()) continue
-            if(isString()) continue
+            if (isInteger()) continue
+            if (isDecimal()) continue
+            if (isString()) continue
             if (isIdentifier()) continue
             if (isArithmeticOperator()) continue
             if (isIncrementOperator()) continue
@@ -32,11 +41,11 @@ class LexicalAnalyzer(var sourceCode: String) {
             if (isTerminal()) continue
             if (isDot()) continue
             if (isSeparator()) continue
-            if(isLogicalOperator()) continue
-            if(isComment()) continue
-            if(isCharacter()) continue
-            if(isGrouper()) continue
-            if(isReservedWord()) continue
+            if (isLogicalOperator()) continue
+            if (isComment()) continue
+            if (isCharacter()) continue
+            if (isGrouper()) continue
+            if (isReservedWord()) continue
 
             storeToken("" + currentCharacter, Category.DESCONOCIDO, currentRow, currentColumn)
             setNextCharacter()
@@ -48,7 +57,7 @@ class LexicalAnalyzer(var sourceCode: String) {
      */
     fun isDecimal(): Boolean {
 
-        if(currentCharacter == '$') {
+        if (currentCharacter == '$') {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
@@ -290,472 +299,472 @@ class LexicalAnalyzer(var sourceCode: String) {
     /**
      * This method allows to verify the reserved words
      */
-    fun isReservedWord():Boolean{
-        if(currentCharacter=='s'||currentCharacter=='t'
-                ||currentCharacter=='o'||currentCharacter=='l'
-                ||currentCharacter=='p'|| currentCharacter=='a'
-                || currentCharacter=='G'||currentCharacter=='c'
-                ||currentCharacter=='r'||currentCharacter=='e'
-                ||currentCharacter=='d'||currentCharacter=='b'){
+    fun isReservedWord(): Boolean {
+        if (currentCharacter == 's' || currentCharacter == 't'
+                || currentCharacter == 'o' || currentCharacter == 'l'
+                || currentCharacter == 'p' || currentCharacter == 'a'
+                || currentCharacter == 'G' || currentCharacter == 'c'
+                || currentCharacter == 'r' || currentCharacter == 'e'
+                || currentCharacter == 'd' || currentCharacter == 'b') {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
             var initialPosition = actualPosition
             var currentCharacterCopy = currentCharacter
-            lexema+=currentCharacter
+            lexema += currentCharacter
             setNextCharacter()
-            if(currentCharacterCopy=='s'&&currentCharacter=='o'){
-                lexema +=currentCharacter
+            if (currentCharacterCopy == 's' && currentCharacter == 'o') {
+                lexema += currentCharacter
                 setNextCharacter()
-                if(currentCharacter=='l'){
-                    lexema+=currentCharacter
+                if (currentCharacter == 'l') {
+                    lexema += currentCharacter
                     setNextCharacter()
-                    if(currentCharacter=='o'){
-                        lexema+=currentCharacter
+                    if (currentCharacter == 'o') {
+                        lexema += currentCharacter
                         setNextCharacter()
-                    }else{
-                        doBackTracking(initialPosition, initialRow,initialColumn)
+                    } else {
+                        doBackTracking(initialPosition, initialRow, initialColumn)
                         return false
                     }
-                }else{
+                } else {
                     doBackTracking(initialPosition, initialRow, initialColumn)
                     return false
                 }
-            }else if(currentCharacterCopy=='t'&&currentCharacter=='u'){
-                lexema+=currentCharacter
+            } else if (currentCharacterCopy == 't' && currentCharacter == 'u') {
+                lexema += currentCharacter
                 setNextCharacter()
-                if(currentCharacter=='t'){
-                    lexema+=currentCharacter
+                if (currentCharacter == 't') {
+                    lexema += currentCharacter
                     setNextCharacter()
-                    if(currentCharacter=='t'){
-                        lexema+=currentCharacter
+                    if (currentCharacter == 't') {
+                        lexema += currentCharacter
                         setNextCharacter()
-                        if(currentCharacter=='i'){
-                            lexema+=currentCharacter
+                        if (currentCharacter == 'i') {
+                            lexema += currentCharacter
                             setNextCharacter()
-                        }else{
+                        } else {
                             doBackTracking(initialPosition, initialRow, initialColumn)
                             return false
                         }
-                    }else{
+                    } else {
                         doBackTracking(initialPosition, initialRow, initialColumn)
                         return false
                     }
                 }
-            }else if(currentCharacterCopy=='o'&&currentCharacter=='p'){
-                lexema+=currentCharacter
+            } else if (currentCharacterCopy == 'o' && currentCharacter == 'p') {
+                lexema += currentCharacter
                 setNextCharacter()
-                if(currentCharacter=='u'){
-                    lexema+=currentCharacter
+                if (currentCharacter == 'u') {
+                    lexema += currentCharacter
                     setNextCharacter()
-                    if(currentCharacter=='s'){
-                        lexema+=currentCharacter
+                    if (currentCharacter == 's') {
+                        lexema += currentCharacter
                         setNextCharacter()
-                    }else{
+                    } else {
                         doBackTracking(initialPosition, initialRow, initialColumn)
                         return false
                     }
-                }else if(currentCharacter=='t'){
-                    lexema+=currentCharacter
+                } else if (currentCharacter == 't') {
+                    lexema += currentCharacter
                     setNextCharacter()
-                    if(currentCharacter=='i'){
-                        lexema+=currentCharacter
+                    if (currentCharacter == 'i') {
+                        lexema += currentCharacter
                         setNextCharacter()
-                        if(currentCharacter=='o'){
-                            lexema+=currentCharacter
+                        if (currentCharacter == 'o') {
+                            lexema += currentCharacter
                             setNextCharacter()
-                            if(currentCharacter=='n'){
-                                lexema+=currentCharacter
+                            if (currentCharacter == 'n') {
+                                lexema += currentCharacter
                                 setNextCharacter()
-                            }else{
+                            } else {
                                 doBackTracking(initialPosition, initialRow, initialColumn)
                                 return false
                             }
-                        }else{
-                            doBackTracking(initialPosition, initialRow,initialColumn)
+                        } else {
+                            doBackTracking(initialPosition, initialRow, initialColumn)
                             return false
                         }
-                    }else{
-                        doBackTracking(initialPosition, initialRow,initialColumn)
-                        return false
-                    }
-                }else{
-                    doBackTracking(initialPosition, initialRow, initialColumn)
-                    return false
-                }
-            }else if(currentCharacterCopy=='l'&&currentCharacter=='a'){//Falta el resto desde la l de largo
-                lexema+=currentCharacter
-                setNextCharacter()
-                if(currentCharacter=='r'){
-                    lexema+=currentCharacter
-                    setNextCharacter()
-                    if(currentCharacter=='g'){
-                        lexema+=currentCharacter
-                        setNextCharacter()
-                        if(currentCharacter=='o'){
-                            lexema+=currentCharacter
-                            setNextCharacter()
-                        }else{
-                            doBackTracking(initialPosition,initialRow, initialColumn)
-                            return false
-                        }
-                    }else{
+                    } else {
                         doBackTracking(initialPosition, initialRow, initialColumn)
                         return false
                     }
-                }else{
+                } else {
                     doBackTracking(initialPosition, initialRow, initialColumn)
                     return false
                 }
-            }else if(currentCharacterCopy=='p'&&currentCharacter=='u'){
+            } else if (currentCharacterCopy == 'l' && currentCharacter == 'a') {//Falta el resto desde la l de largo
                 lexema += currentCharacter
                 setNextCharacter()
-                if(currentCharacter=='l'){
-                    lexema+=currentCharacter
+                if (currentCharacter == 'r') {
+                    lexema += currentCharacter
                     setNextCharacter()
-                    if(currentCharacter=='s'){
-                        lexema+=currentCharacter
+                    if (currentCharacter == 'g') {
+                        lexema += currentCharacter
                         setNextCharacter()
-                        if(currentCharacter=='o'){
-                            lexema+=currentCharacter
+                        if (currentCharacter == 'o') {
+                            lexema += currentCharacter
                             setNextCharacter()
-                        }else{
-                            doBackTracking(initialPosition, initialRow,initialColumn)
+                        } else {
+                            doBackTracking(initialPosition, initialRow, initialColumn)
                             return false
                         }
-                    }else{
+                    } else {
                         doBackTracking(initialPosition, initialRow, initialColumn)
                         return false
                     }
-                }else{
+                } else {
                     doBackTracking(initialPosition, initialRow, initialColumn)
                     return false
                 }
-            }else if(currentCharacterCopy=='p'&&currentCharacter=='r'){
-                lexema+=currentCharacter
+            } else if (currentCharacterCopy == 'p' && currentCharacter == 'u') {
+                lexema += currentCharacter
                 setNextCharacter()
-                if(currentCharacter=='o'){
-                    lexema+=currentCharacter
+                if (currentCharacter == 'l') {
+                    lexema += currentCharacter
                     setNextCharacter()
-                    if(currentCharacter=='t'){
-                        lexema+=currentCharacter
+                    if (currentCharacter == 's') {
+                        lexema += currentCharacter
                         setNextCharacter()
-                        if(currentCharacter=='e'){
-                            lexema+=currentCharacter
+                        if (currentCharacter == 'o') {
+                            lexema += currentCharacter
                             setNextCharacter()
-                            if(currentCharacter=='t'){
-                                lexema+=currentCharacter
+                        } else {
+                            doBackTracking(initialPosition, initialRow, initialColumn)
+                            return false
+                        }
+                    } else {
+                        doBackTracking(initialPosition, initialRow, initialColumn)
+                        return false
+                    }
+                } else {
+                    doBackTracking(initialPosition, initialRow, initialColumn)
+                    return false
+                }
+            } else if (currentCharacterCopy == 'p' && currentCharacter == 'r') {
+                lexema += currentCharacter
+                setNextCharacter()
+                if (currentCharacter == 'o') {
+                    lexema += currentCharacter
+                    setNextCharacter()
+                    if (currentCharacter == 't') {
+                        lexema += currentCharacter
+                        setNextCharacter()
+                        if (currentCharacter == 'e') {
+                            lexema += currentCharacter
+                            setNextCharacter()
+                            if (currentCharacter == 't') {
+                                lexema += currentCharacter
                                 setNextCharacter()
-                                if(currentCharacter=='o'){
-                                    lexema+=currentCharacter
+                                if (currentCharacter == 'o') {
+                                    lexema += currentCharacter
                                     setNextCharacter()
-                                }else{
+                                } else {
                                     doBackTracking(initialPosition, initialRow, initialColumn)
                                     return false
                                 }
-                            }else{
+                            } else {
                                 doBackTracking(initialPosition, initialRow, initialColumn)
                                 return false
                             }
-                        }else{
+                        } else {
                             doBackTracking(initialPosition, initialRow, initialColumn)
                             return false
                         }
-                    }else{
+                    } else {
                         doBackTracking(initialPosition, initialRow, initialColumn)
                         return false
                     }
-                }else{
+                } else {
                     doBackTracking(initialPosition, initialRow, initialColumn)
                     return false
                 }
-            }else if(currentCharacterCopy=='a'&&currentCharacter=='n'){
-                lexema+=currentCharacter
+            } else if (currentCharacterCopy == 'a' && currentCharacter == 'n') {
+                lexema += currentCharacter
                 setNextCharacter()
-                if(currentCharacter=='t'){
-                    lexema+=currentCharacter
+                if (currentCharacter == 't') {
+                    lexema += currentCharacter
                     setNextCharacter()
-                    if(currentCharacter=='e'){
-                        lexema+=currentCharacter
+                    if (currentCharacter == 'e') {
+                        lexema += currentCharacter
                         setNextCharacter()
-                    }else{
+                    } else {
                         doBackTracking(initialPosition, initialRow, initialColumn)
                         return false
                     }
-                }else{
+                } else {
                     doBackTracking(initialPosition, initialRow, initialColumn)
                     return false
                 }
-            }else if(currentCharacterCopy=='a'&&currentCharacter=='c'){
-                lexema+=currentCharacter
+            } else if (currentCharacterCopy == 'a' && currentCharacter == 'c') {
+                lexema += currentCharacter
                 setNextCharacter()
-                if(currentCharacter=='c'){
-                    lexema+=currentCharacter
+                if (currentCharacter == 'c') {
+                    lexema += currentCharacter
                     setNextCharacter()
-                    if(currentCharacter=='a'){
-                        lexema+=currentCharacter
+                    if (currentCharacter == 'a') {
+                        lexema += currentCharacter
                         setNextCharacter()
-                    }else{
+                    } else {
                         doBackTracking(initialPosition, initialRow, initialColumn)
                         return false
                     }
-                }else{
+                } else {
                     doBackTracking(initialPosition, initialRow, initialColumn)
                     return false
                 }
-            }else if(currentCharacterCopy=='G'&&currentCharacter=='P'){
-                lexema+=currentCharacter
+            } else if (currentCharacterCopy == 'G' && currentCharacter == 'P') {
+                lexema += currentCharacter
                 setNextCharacter()
-            }else if(currentCharacterCopy=='c'&&currentCharacter=='o'){
-                lexema+=currentCharacter
+            } else if (currentCharacterCopy == 'c' && currentCharacter == 'o') {
+                lexema += currentCharacter
                 setNextCharacter()
-                if (currentCharacter=='d'){
-                    lexema+=currentCharacter
+                if (currentCharacter == 'd') {
+                    lexema += currentCharacter
                     setNextCharacter()
-                    if(currentCharacter=='a'){
-                        lexema+=currentCharacter
+                    if (currentCharacter == 'a') {
+                        lexema += currentCharacter
                         setNextCharacter()
-                    }else{
+                    } else {
                         doBackTracking(initialPosition, initialRow, initialColumn)
                         return false
                     }
-                }else if(currentCharacter=='n'){
-                    lexema+=currentCharacter
+                } else if (currentCharacter == 'n') {
+                    lexema += currentCharacter
                     setNextCharacter()
-                    if(currentCharacter=='t'){
-                        lexema+=currentCharacter
+                    if (currentCharacter == 't') {
+                        lexema += currentCharacter
                         setNextCharacter()
-                        if(currentCharacter=='r'){
-                            lexema+=currentCharacter
+                        if (currentCharacter == 'r') {
+                            lexema += currentCharacter
                             setNextCharacter()
-                            if(currentCharacter=='a'){
-                                lexema+=currentCharacter
+                            if (currentCharacter == 'a') {
+                                lexema += currentCharacter
                                 setNextCharacter()
-                            }else{
+                            } else {
                                 doBackTracking(initialPosition, initialRow, initialColumn)
                                 return false
                             }
-                        }else{
+                        } else {
                             doBackTracking(initialPosition, initialRow, initialColumn)
                             return false
                         }
-                    }else{
+                    } else {
                         doBackTracking(initialPosition, initialRow, initialColumn)
                         return false
                     }
-                }else{
+                } else {
                     doBackTracking(initialPosition, initialRow, initialColumn)
                     return false
                 }
-            }else if(currentCharacterCopy=='c'&&currentCharacter=='e'){
-                lexema+=currentCharacter
+            } else if (currentCharacterCopy == 'c' && currentCharacter == 'e') {
+                lexema += currentCharacter
                 setNextCharacter()
-                if(currentCharacter=='d'){
-                    lexema+=currentCharacter
+                if (currentCharacter == 'd') {
+                    lexema += currentCharacter
                     setNextCharacter()
-                    if(currentCharacter=='e'){
-                        lexema+=currentCharacter
+                    if (currentCharacter == 'e') {
+                        lexema += currentCharacter
                         setNextCharacter()
-                        if(currentCharacter=='z'){
-                            lexema+=currentCharacter
+                        if (currentCharacter == 'z') {
+                            lexema += currentCharacter
                             setNextCharacter()
-                        }else{
+                        } else {
                             doBackTracking(initialPosition, initialRow, initialColumn)
                             return false
                         }
-                    }else{
+                    } else {
                         doBackTracking(initialPosition, initialRow, initialColumn)
                         return false
                     }
-                }else{
+                } else {
                     doBackTracking(initialPosition, initialRow, initialColumn)
                     return false
                 }
-            }else if(currentCharacterCopy=='r'&&currentCharacter=='o'){
-                lexema+=currentCharacter
+            } else if (currentCharacterCopy == 'r' && currentCharacter == 'o') {
+                lexema += currentCharacter
                 setNextCharacter()
-                if(currentCharacter=='n'){
-                    lexema+=currentCharacterCopy
+                if (currentCharacter == 'n') {
+                    lexema += currentCharacterCopy
                     setNextCharacter()
-                    if(currentCharacter=='d'){
-                        lexema+=currentCharacter
+                    if (currentCharacter == 'd') {
+                        lexema += currentCharacter
                         setNextCharacter()
-                        if(currentCharacter=='o'){
-                            lexema+=currentCharacter
+                        if (currentCharacter == 'o') {
+                            lexema += currentCharacter
                             setNextCharacter()
-                        }else{
+                        } else {
                             doBackTracking(initialPosition, initialRow, initialColumn)
                             return false
                         }
-                    }else{
+                    } else {
                         doBackTracking(initialPosition, initialRow, initialColumn)
                         return false
                     }
-                }else {
+                } else {
                     doBackTracking(initialPosition, initialRow, initialColumn)
                     return false
                 }
-            }else if(currentCharacterCopy=='r'&&currentCharacter=='a'){
-                lexema+=currentCharacter
+            } else if (currentCharacterCopy == 'r' && currentCharacter == 'a') {
+                lexema += currentCharacter
                 setNextCharacter()
-                if(currentCharacter=='s'){
-                    lexema+=currentCharacter
+                if (currentCharacter == 's') {
+                    lexema += currentCharacter
                     setNextCharacter()
-                    if(currentCharacter=='t'){
-                        lexema+=currentCharacter
+                    if (currentCharacter == 't') {
+                        lexema += currentCharacter
                         setNextCharacter()
-                    }else{
+                    } else {
                         doBackTracking(initialPosition, initialRow, initialColumn)
                         return false
                     }
-                }else{
+                } else {
                     doBackTracking(initialPosition, initialRow, initialColumn)
                     return false
                 }
-            }else if(currentCharacterCopy=='e'&&currentCharacter=='v'){
-                lexema+=currentCharacter
+            } else if (currentCharacterCopy == 'e' && currentCharacter == 'v') {
+                lexema += currentCharacter
                 setNextCharacter()
-                if(currentCharacter=='a'){
-                    lexema+=currentCharacter
+                if (currentCharacter == 'a') {
+                    lexema += currentCharacter
                     setNextCharacter()
 
-                }else{
+                } else {
                     doBackTracking(initialPosition, initialRow, initialColumn)
                     return false
                 }
-            }else if(currentCharacterCopy=='e'&&currentCharacter=='n'){
-                lexema+=currentCharacter
+            } else if (currentCharacterCopy == 'e' && currentCharacter == 'n') {
+                lexema += currentCharacter
                 setNextCharacter()
-                if(currentCharacter=='c'){
-                    lexema+=currentCharacter
+                if (currentCharacter == 'c') {
+                    lexema += currentCharacter
                     setNextCharacter()
-                    if(currentCharacter=='o'){
-                        lexema+=currentCharacter
+                    if (currentCharacter == 'o') {
+                        lexema += currentCharacter
                         setNextCharacter()
-                        if(currentCharacter=='r'){
-                            lexema+=currentCharacter
+                        if (currentCharacter == 'r') {
+                            lexema += currentCharacter
                             setNextCharacter()
-                            if(currentCharacter=='e'){
-                                lexema+=currentCharacter
+                            if (currentCharacter == 'e') {
+                                lexema += currentCharacter
                                 setNextCharacter()
-                            }else{
+                            } else {
                                 doBackTracking(initialPosition, initialRow, initialColumn)
                                 return false
                             }
-                        }else{
+                        } else {
                             doBackTracking(initialPosition, initialRow, initialColumn)
                             return false
                         }
-                    }else{
+                    } else {
                         doBackTracking(initialPosition, initialRow, initialColumn)
                         return false
                     }
-                }else{
+                } else {
                     doBackTracking(initialPosition, initialRow, initialColumn)
                     return false
                 }
-            }else if(currentCharacterCopy=='d'&&currentCharacter=='a'){
-                lexema+=currentCharacter
+            } else if (currentCharacterCopy == 'd' && currentCharacter == 'a') {
+                lexema += currentCharacter
                 setNextCharacter()
-                if(currentCharacter=='c'){
-                    lexema+=currentCharacter
+                if (currentCharacter == 'c') {
+                    lexema += currentCharacter
                     setNextCharacter()
-                    if(currentCharacter=='a'){
-                        lexema+=currentCharacter
+                    if (currentCharacter == 'a') {
+                        lexema += currentCharacter
                         setNextCharacter()
-                        if(currentCharacter=='p'){
-                            lexema+=currentCharacter
+                        if (currentCharacter == 'p') {
+                            lexema += currentCharacter
                             setNextCharacter()
-                            if(currentCharacter=='o'){
-                                lexema+=currentCharacter
+                            if (currentCharacter == 'o') {
+                                lexema += currentCharacter
                                 setNextCharacter()
-                            }else{
-                                doBackTracking(initialPosition,initialRow, initialColumn)
-                                return false
-                            }
-                        }else{
-                            doBackTracking(initialPosition, initialRow, initialColumn)
-                            return false
-                        }
-                    }else{
-                        doBackTracking(initialPosition, initialRow, initialColumn)
-                        return false
-                    }
-                }else{
-                    doBackTracking(initialPosition, initialRow, initialColumn)
-                    return false
-                }
-            }else if(currentCharacterCopy=='b'&&currentCharacter=='e'){
-                lexema+=currentCharacter
-                setNextCharacter()
-                if(currentCharacter=='c'){
-                    lexema+=currentCharacter
-                    setNextCharacter()
-                    if(currentCharacter=='u'){
-                        lexema+=currentCharacter
-                        setNextCharacter()
-                    }else{
-                        doBackTracking(initialPosition, initialRow, initialColumn)
-                        return false
-                    }
-                }else if(currentCharacter=='m'){
-                    lexema+=currentCharacter
-                    setNextCharacter()
-                    if(currentCharacter=='o'){
-                        lexema+=currentCharacter
-                        setNextCharacter()
-                        if(currentCharacter=='l'){
-                            lexema+=currentCharacter
-                            setNextCharacter()
-                        }else{
-                            doBackTracking(initialPosition, initialRow, initialColumn)
-                            return false
-                        }
-                    }else{
-                        doBackTracking(initialPosition, initialRow, initialColumn)
-                        return false
-                    }
-                }else{
-                    doBackTracking(initialPosition, initialRow, initialColumn)
-                    return false
-                }
-            }else if(currentCharacterCopy=='b'&&currentCharacter=='r'){
-                lexema+=currentCharacter
-                setNextCharacter()
-                if(currentCharacter=='i'){
-                    lexema+=currentCharacter
-                    setNextCharacter()
-                    if(currentCharacter=='d'){
-                        lexema+=currentCharacter
-                        setNextCharacter()
-                        if(currentCharacter=='g'){
-                            lexema+=currentCharacter
-                            setNextCharacter()
-                            if(currentCharacter=='e'){
-                                lexema+=currentCharacter
-                                setNextCharacter()
-                            }else{
+                            } else {
                                 doBackTracking(initialPosition, initialRow, initialColumn)
                                 return false
                             }
-                        }else{
+                        } else {
                             doBackTracking(initialPosition, initialRow, initialColumn)
                             return false
                         }
-                    }else{
+                    } else {
                         doBackTracking(initialPosition, initialRow, initialColumn)
                         return false
                     }
-                }else{
+                } else {
                     doBackTracking(initialPosition, initialRow, initialColumn)
                     return false
                 }
-            }else{
+            } else if (currentCharacterCopy == 'b' && currentCharacter == 'e') {
+                lexema += currentCharacter
+                setNextCharacter()
+                if (currentCharacter == 'c') {
+                    lexema += currentCharacter
+                    setNextCharacter()
+                    if (currentCharacter == 'u') {
+                        lexema += currentCharacter
+                        setNextCharacter()
+                    } else {
+                        doBackTracking(initialPosition, initialRow, initialColumn)
+                        return false
+                    }
+                } else if (currentCharacter == 'm') {
+                    lexema += currentCharacter
+                    setNextCharacter()
+                    if (currentCharacter == 'o') {
+                        lexema += currentCharacter
+                        setNextCharacter()
+                        if (currentCharacter == 'l') {
+                            lexema += currentCharacter
+                            setNextCharacter()
+                        } else {
+                            doBackTracking(initialPosition, initialRow, initialColumn)
+                            return false
+                        }
+                    } else {
+                        doBackTracking(initialPosition, initialRow, initialColumn)
+                        return false
+                    }
+                } else {
+                    doBackTracking(initialPosition, initialRow, initialColumn)
+                    return false
+                }
+            } else if (currentCharacterCopy == 'b' && currentCharacter == 'r') {
+                lexema += currentCharacter
+                setNextCharacter()
+                if (currentCharacter == 'i') {
+                    lexema += currentCharacter
+                    setNextCharacter()
+                    if (currentCharacter == 'd') {
+                        lexema += currentCharacter
+                        setNextCharacter()
+                        if (currentCharacter == 'g') {
+                            lexema += currentCharacter
+                            setNextCharacter()
+                            if (currentCharacter == 'e') {
+                                lexema += currentCharacter
+                                setNextCharacter()
+                            } else {
+                                doBackTracking(initialPosition, initialRow, initialColumn)
+                                return false
+                            }
+                        } else {
+                            doBackTracking(initialPosition, initialRow, initialColumn)
+                            return false
+                        }
+                    } else {
+                        doBackTracking(initialPosition, initialRow, initialColumn)
+                        return false
+                    }
+                } else {
+                    doBackTracking(initialPosition, initialRow, initialColumn)
+                    return false
+                }
+            } else {
                 doBackTracking(initialPosition, initialRow, initialColumn)
                 return false
             }
 
-            storeToken(lexema, Category.PALABRA_RESERVADA, initialRow,initialColumn)
+            storeToken(lexema, Category.PALABRA_RESERVADA, initialRow, initialColumn)
             return true
         }
         return false
@@ -764,8 +773,8 @@ class LexicalAnalyzer(var sourceCode: String) {
     /**
      * This method allows to verify the logical operators
      */
-    fun isLogicalOperator():Boolean{
-        if(currentCharacter=='a'||currentCharacter=='o'){
+    fun isLogicalOperator(): Boolean {
+        if (currentCharacter == 'a' || currentCharacter == 'o') {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
@@ -773,21 +782,21 @@ class LexicalAnalyzer(var sourceCode: String) {
             var currentCharacterCopy = currentCharacter
             lexema += currentCharacter
             setNextCharacter()//Cambiar nombre a actualizar caracter
-            if((currentCharacterCopy=='a'&&currentCharacter=='n')){
-                lexema+=currentCharacter
+            if ((currentCharacterCopy == 'a' && currentCharacter == 'n')) {
+                lexema += currentCharacter
                 setNextCharacter()
-                if(currentCharacter=='d'){
+                if (currentCharacter == 'd') {
                     lexema += currentCharacter
                     setNextCharacter()
-                }else{
+                } else {
                     doBackTracking(initialPosition, initialRow, initialColumn)
                     return false
                 }
-            }else if(currentCharacterCopy=='o'&&currentCharacter=='r'){
-                lexema+=currentCharacter
+            } else if (currentCharacterCopy == 'o' && currentCharacter == 'r') {
+                lexema += currentCharacter
                 setNextCharacter()
-            }else{
-                doBackTracking(initialPosition,initialRow, initialColumn)
+            } else {
+                doBackTracking(initialPosition, initialRow, initialColumn)
                 return false
             }
             storeToken(lexema, Category.OPERADOR_LOGICO, initialRow, initialColumn)
@@ -800,7 +809,7 @@ class LexicalAnalyzer(var sourceCode: String) {
      * this method allows to identify if it is a whole number
      */
     fun isInteger(): Boolean {
-        if(currentCharacter == '#') {
+        if (currentCharacter == '#') {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
@@ -830,7 +839,9 @@ class LexicalAnalyzer(var sourceCode: String) {
         return false
     }
 
-
+    /**
+     * this method allows to identify if it is an identifier
+     */
     fun isIdentifier(): Boolean {
 
         if (currentCharacter == '~') {
@@ -848,19 +859,22 @@ class LexicalAnalyzer(var sourceCode: String) {
                 setNextCharacter()
 
                 while ((currentCharacter.isLetter() || currentCharacter.isDigit()) && count <= 8) {
-                    count ++
+                    count++
                     lexema += currentCharacter
                     setNextCharacter()
                 }
                 storeToken(lexema, Category.IDENTIFICADOR, initialRow, initialColumn)
                 return true
             } else {
-                doBackTracking(actual,initialRow,initialColumn)
+                doBackTracking(actual, initialRow, initialColumn)
             }
         }
         return false
     }
 
+    /**
+     * this method allows to identify if it is a colon
+     */
     fun isColon(): Boolean {
 
         if (currentCharacter == ';') {
@@ -877,7 +891,10 @@ class LexicalAnalyzer(var sourceCode: String) {
         return false
     }
 
-    fun isTerminal():Boolean{
+    /**
+     * this method allows to identify if it is a terminal
+     */
+    fun isTerminal(): Boolean {
 
         if (currentCharacter == '\\') {
             var lexema = ""
@@ -893,7 +910,10 @@ class LexicalAnalyzer(var sourceCode: String) {
         return false
     }
 
-    fun isDot():Boolean{
+    /**
+     * this method allows to identify if it is a dot
+     */
+    fun isDot(): Boolean {
 
         if (currentCharacter == ',') {
             var lexema = ""
@@ -909,7 +929,10 @@ class LexicalAnalyzer(var sourceCode: String) {
         return false
     }
 
-    fun isSeparator():Boolean{
+    /**
+     * this method allows to identify if it is a separator
+     */
+    fun isSeparator(): Boolean {
 
         if (currentCharacter == '_') {
             var lexema = ""
@@ -939,15 +962,15 @@ class LexicalAnalyzer(var sourceCode: String) {
             lexema += currentCharacter
             setNextCharacter()//Cambiar nombre a actualizar caracter
 
-            if(currentCharacter == '['){
-            while (currentCharacter != '\n') {
+            if (currentCharacter == '[') {
+                while (currentCharacter != '\n') {
+                    lexema += currentCharacter
+                    setNextCharacter()//Cambiar nombre a actualizar caracter
+                }
                 lexema += currentCharacter
-                setNextCharacter()//Cambiar nombre a actualizar caracter
-            }
-            lexema += currentCharacter
-            setNextCharacter()
-            storeToken(lexema, Category.COMENTARIO, initialRow, initialColumn)
-            return true
+                setNextCharacter()
+                storeToken(lexema, Category.COMENTARIO, initialRow, initialColumn)
+                return true
             }
         }
 
@@ -987,11 +1010,11 @@ class LexicalAnalyzer(var sourceCode: String) {
             lexema += currentCharacter
             setNextCharacter()//Cambiar nombre a actualizar caracter
 
-            if (currentCharacter !='?') {
+            if (currentCharacter != '?') {
                 lexema += currentCharacter
                 setNextCharacter()//Cambiar nombre a actualizar caracter
             }
-            if(currentCharacter !='?') {
+            if (currentCharacter != '?') {
                 return false
             }
             lexema += currentCharacter
@@ -1008,21 +1031,19 @@ class LexicalAnalyzer(var sourceCode: String) {
      */
     fun isGrouper(): Boolean {
 
-        if(currentCharacter == '|')
-        {
-                var lexema = ""
-                var initialRow = currentRow
-                var initialColumn = currentColumn
-                var actual = actualPosition
-                lexema += currentCharacter
-                setNextCharacter()
+        if (currentCharacter == '|') {
+            var lexema = ""
+            var initialRow = currentRow
+            var initialColumn = currentColumn
+            var actual = actualPosition
+            lexema += currentCharacter
+            setNextCharacter()
 
-                storeToken(lexema, Category.AGRUPADOR, initialRow, initialColumn)
-                return true
+            storeToken(lexema, Category.AGRUPADOR, initialRow, initialColumn)
+            return true
 
         }
-        if(currentCharacter == '/')
-        {
+        if (currentCharacter == '/') {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
@@ -1035,8 +1056,7 @@ class LexicalAnalyzer(var sourceCode: String) {
 
 
         }
-        if(currentCharacter == '<')
-        {
+        if (currentCharacter == '<') {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
@@ -1054,8 +1074,7 @@ class LexicalAnalyzer(var sourceCode: String) {
 
 
         }
-        if(currentCharacter == '>')
-        {
+        if (currentCharacter == '>') {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
@@ -1103,10 +1122,12 @@ class LexicalAnalyzer(var sourceCode: String) {
     /**
      * This method allows to fill the token list
      */
-    fun storeToken(lexema: String, category: Category, row: Int, column: Int) = tokenList.add(Token(lexema, category, row, column))
+    fun storeToken(lexema: String, category: Category, row: Int, column: Int) =
+            tokenList.add(Token(lexema, category, row, column))
 
     /**
      * This method allows to fill the error list
      */
-    fun storeError(error: String, row: Int, column: Int, errorCategory: ErrorCategory) = errorList.add(Error(error, row, column, errorCategory))
+    fun storeError(error: String, row: Int, column: Int, errorCategory: ErrorCategory) =
+            errorList.add(Error(error, row, column, errorCategory))
 }

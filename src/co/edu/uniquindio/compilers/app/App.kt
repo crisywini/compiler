@@ -7,8 +7,17 @@ import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.stage.Stage
 
+/**
+ *
+ * Main Class
+ * @author Cristian Giovanny Sánchez Pineda
+ * @author Anjully Tatiana Mora Acosta
+ * @author Luisa Fernanda Cotte Sánchez
+ * @version 1.0
+ *
+ */
 class App : Application(){
-
+    
     override fun start(primaryStage: Stage?) {
         val loader = FXMLLoader(App::class.java.getResource("/RootView.fxml"))
         val parent:Parent = loader.load()
