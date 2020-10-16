@@ -962,7 +962,7 @@ class LexicalAnalyzer(var sourceCode: String) {
             lexema += currentCharacter
             setNextCharacter()//Cambiar nombre a actualizar caracter
 
-            if (currentCharacter == '[') {
+            if(currentCharacter == '['){
                 while (currentCharacter != '\n') {
                     lexema += currentCharacter
                     setNextCharacter()//Cambiar nombre a actualizar caracter
@@ -972,6 +972,11 @@ class LexicalAnalyzer(var sourceCode: String) {
                 storeToken(lexema, Category.COMENTARIO, initialRow, initialColumn)
                 return true
             }
+            else{
+                doBackTracking(initialPosition, initialRow, initialColumn)
+                return false
+            }
+
         }
 
         if (currentCharacter == '^') {
@@ -995,7 +1000,6 @@ class LexicalAnalyzer(var sourceCode: String) {
         return false
     }
 
-
     /**
      * this method allows to identify if it is a character
      */
@@ -1007,16 +1011,63 @@ class LexicalAnalyzer(var sourceCode: String) {
             var initialRow = currentRow
             var initialColumn = currentColumn
             var initialPosition = actualPosition
+            var isError=false
             lexema += currentCharacter
             setNextCharacter()//Cambiar nombre a actualizar caracter
 
-            if (currentCharacter != '?') {
+            if (currentCharacter !='?' && currentCharacter !='°' ) {
                 lexema += currentCharacter
                 setNextCharacter()//Cambiar nombre a actualizar caracter
+
+                if(currentCharacter !='?') {
+                    isError=true
+
+                    while(currentCharacter !='?'){
+                        lexema += currentCharacter
+                        setNextCharacter()//Cambiar nombre a actualizar caracter
+                    }
+                }
             }
-            if (currentCharacter != '?') {
-                return false
+            else {
+
+                if (currentCharacter == '°') {
+                    lexema += currentCharacter
+                    setNextCharacter()//Cambiar nombre a actualizar caracter
+                    if (currentCharacter == 'n' || currentCharacter == 't' || currentCharacter == 'b'
+                            || currentCharacter == 'r' || currentCharacter == '(' || currentCharacter == ')'
+                            || currentCharacter == '?' || currentCharacter == '¿') {
+
+                        lexema += currentCharacter
+                        setNextCharacter()//Cambiar nombre a actualizar caracter
+                        if(currentCharacter != '?')
+                        {
+                            isError=true
+
+                            while(currentCharacter !='?'){
+                                lexema += currentCharacter
+                                setNextCharacter()//Cambiar nombre a actualizar caracter
+                            }
+                        }
+
+                    }
+                    else {
+                        isError=true
+                        while(currentCharacter !='?'){
+                            lexema += currentCharacter
+                            setNextCharacter()//Cambiar nombre a actualizar caracter
+                        }
+                    }
+                }
             }
+
+
+            if (isError) {
+                lexema += currentCharacter
+                setNextCharacter()
+                storeError(lexema, initialRow, initialColumn, ErrorCategory.ERROR_LEXICO)
+                return true
+            }
+
             lexema += currentCharacter
             setNextCharacter()
             storeToken(lexema, Category.CARACTER, initialRow, initialColumn)
@@ -1031,7 +1082,8 @@ class LexicalAnalyzer(var sourceCode: String) {
      */
     fun isGrouper(): Boolean {
 
-        if (currentCharacter == '|') {
+        if(currentCharacter == '|')
+        {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
@@ -1043,7 +1095,8 @@ class LexicalAnalyzer(var sourceCode: String) {
             return true
 
         }
-        if (currentCharacter == '/') {
+        if(currentCharacter == '/')
+        {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
@@ -1056,7 +1109,8 @@ class LexicalAnalyzer(var sourceCode: String) {
 
 
         }
-        if (currentCharacter == '<') {
+        if(currentCharacter == '<')
+        {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
@@ -1074,7 +1128,8 @@ class LexicalAnalyzer(var sourceCode: String) {
 
 
         }
-        if (currentCharacter == '>') {
+        if(currentCharacter == '>')
+        {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
@@ -1094,8 +1149,6 @@ class LexicalAnalyzer(var sourceCode: String) {
         }
         return false
     }
-
-
     /**
      * This method allows to:
      * increment the actual position,
