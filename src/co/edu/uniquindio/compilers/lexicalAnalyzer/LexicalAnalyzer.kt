@@ -963,7 +963,7 @@ class LexicalAnalyzer(var sourceCode: String) {
             setNextCharacter()//Cambiar nombre a actualizar caracter
 
             if(currentCharacter == '['){
-                while (currentCharacter != '\n') {
+                while (currentCharacter != '\n' && currentCharacter != endCode) {
                     lexema += currentCharacter
                     setNextCharacter()//Cambiar nombre a actualizar caracter
                 }
