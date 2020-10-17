@@ -17,7 +17,9 @@ import javafx.stage.Stage
  *
  */
 class App : Application(){
-    
+    /**
+     * start method
+     */
     override fun start(primaryStage: Stage?) {
         val loader = FXMLLoader(App::class.java.getResource("/RootView.fxml"))
         val parent:Parent = loader.load()
@@ -29,6 +31,10 @@ class App : Application(){
         primaryStage?.title = "Compiler"
         primaryStage?.show()
     }
+
+    /**
+     * main method
+     */
     companion object{
         @JvmStatic
         fun main(args: Array<String>){
