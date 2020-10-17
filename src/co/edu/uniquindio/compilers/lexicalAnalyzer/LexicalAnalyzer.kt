@@ -44,8 +44,13 @@ class LexicalAnalyzer(var sourceCode: String) {
             if (isLogicalOperator()) continue
             if (isComment()) continue
             if (isCharacter()) continue
-            if (isGrouper()) continue
             if (isReservedWord()) continue
+            if (isLeftKey()) continue
+            if (isRightKey()) continue
+            if (isLeftParenthesis()) continue
+            if (isRightParenthesis()) continue
+            if (isLeftBracket()) continue
+            if (isRightBracket()) continue
 
             storeToken("" + currentCharacter, Category.DESCONOCIDO, currentRow, currentColumn)
             setNextCharacter()
@@ -1078,37 +1083,10 @@ class LexicalAnalyzer(var sourceCode: String) {
     }
 
     /**
-     * this method identifies groupers
+     * this method identifies left brace
      */
-    fun isGrouper(): Boolean {
+    fun isLeftKey():Boolean{
 
-        if(currentCharacter == '|')
-        {
-            var lexema = ""
-            var initialRow = currentRow
-            var initialColumn = currentColumn
-            var actual = actualPosition
-            lexema += currentCharacter
-            setNextCharacter()
-
-            storeToken(lexema, Category.AGRUPADOR, initialRow, initialColumn)
-            return true
-
-        }
-        if(currentCharacter == '/')
-        {
-            var lexema = ""
-            var initialRow = currentRow
-            var initialColumn = currentColumn
-            var actual = actualPosition
-            lexema += currentCharacter
-            setNextCharacter()
-
-            storeToken(lexema, Category.AGRUPADOR, initialRow, initialColumn)
-            return true
-
-
-        }
         if(currentCharacter == '<')
         {
             var lexema = ""
@@ -1118,16 +1096,20 @@ class LexicalAnalyzer(var sourceCode: String) {
             lexema += currentCharacter
             setNextCharacter()
 
-            if (currentCharacter == ':' || currentCharacter == '-') {
+            if(currentCharacter=='-' || currentCharacter==':'){
                 doBackTracking(actual, initialRow, initialColumn)
                 return false
             }
-
-            storeToken(lexema, Category.AGRUPADOR, initialRow, initialColumn)
+            storeToken(lexema, Category.LLAVE_IZQUIERDA, initialRow, initialColumn)
             return true
-
-
         }
+        return false
+    }
+    /**
+     * this method identifies Right brace
+     */
+    fun isRightKey():Boolean{
+
         if(currentCharacter == '>')
         {
             var lexema = ""
@@ -1137,18 +1119,96 @@ class LexicalAnalyzer(var sourceCode: String) {
             lexema += currentCharacter
             setNextCharacter()
 
-            if (currentCharacter == ':') {
+            if(currentCharacter==':'){
+                doBackTracking(actual, initialRow, initialColumn)
+                return false
+            }
+            storeToken(lexema, Category.LLAVE_DERECHA, initialRow, initialColumn)
+            return true
+        }
+        return false
+    }
+    /**
+     * this method identifies left parentheses
+     */
+    fun isLeftParenthesis():Boolean{
+
+        if(currentCharacter == '[')
+        {
+            var lexema = ""
+            var initialRow = currentRow
+            var initialColumn = currentColumn
+            var actual = actualPosition
+            lexema += currentCharacter
+            setNextCharacter()
+            if(currentCharacter=='['){
                 doBackTracking(actual, initialRow, initialColumn)
                 return false
             }
 
-            storeToken(lexema, Category.AGRUPADOR, initialRow, initialColumn)
+            storeToken(lexema, Category.PARENTESIS_IZQUIERDO, initialRow, initialColumn)
             return true
-
-
         }
         return false
     }
+    /**
+     * this method identifies right parentheses
+     */
+    fun isRightParenthesis():Boolean{
+
+        if(currentCharacter == ']')
+        {
+            var lexema = ""
+            var initialRow = currentRow
+            var initialColumn = currentColumn
+            var actual = actualPosition
+            lexema += currentCharacter
+            setNextCharacter()
+
+            storeToken(lexema, Category.PARENTESIS_DERECHO, initialRow, initialColumn)
+            return true
+        }
+        return false
+    }
+    /**
+     * this method identifies the Right bracket
+     */
+    fun isRightBracket():Boolean{
+
+        if(currentCharacter == '{')
+        {
+            var lexema = ""
+            var initialRow = currentRow
+            var initialColumn = currentColumn
+            var actual = actualPosition
+            lexema += currentCharacter
+            setNextCharacter()
+
+            storeToken(lexema, Category.CORCHETE_IZQUIERDO, initialRow, initialColumn)
+            return true
+        }
+        return false
+    }
+    /**
+     * this method identifies the left bracket
+     */
+    fun isLeftBracket():Boolean{
+
+        if(currentCharacter == '}')
+        {
+            var lexema = ""
+            var initialRow = currentRow
+            var initialColumn = currentColumn
+            var actual = actualPosition
+            lexema += currentCharacter
+            setNextCharacter()
+
+            storeToken(lexema, Category.CORCHETE_DERECHO, initialRow, initialColumn)
+            return true
+        }
+        return false
+    }
+
     /**
      * This method allows to:
      * increment the actual position,
