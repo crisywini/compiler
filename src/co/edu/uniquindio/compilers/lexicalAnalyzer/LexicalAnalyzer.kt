@@ -129,18 +129,21 @@ class LexicalAnalyzer(var sourceCode: String) {
             var isError = false
             lexema += currentCharacter
             setNextCharacter()//Cambiar nombre a actualizar caracter
-            while (currentCharacter != ')') {
+            while (currentCharacter != ')' && currentCharacter != endCode) {
                 lexema += currentCharacter
                 setNextCharacter()//Cambiar nombre a actualizar caracter
                 if (currentCharacter == '°') {
                     lexema += currentCharacter
                     setNextCharacter()
                     if (currentCharacter != 'n' && currentCharacter != 't' && currentCharacter != 'b'
-                            && currentCharacter != 'r' && currentCharacter != '(' || currentCharacter != ')'
+                            && currentCharacter != 'r' && currentCharacter != '(' && currentCharacter != ')'
                             && currentCharacter != '?' && currentCharacter != '¿') {
                         isError = true
                     }
                 }
+            }
+            if(currentCharacter==endCode){
+                isError = true
             }
             if (isError) {
                 lexema += currentCharacter
@@ -589,7 +592,7 @@ class LexicalAnalyzer(var sourceCode: String) {
                 lexema += currentCharacter
                 setNextCharacter()
                 if (currentCharacter == 'n') {
-                    lexema += currentCharacterCopy
+                    lexema += currentCharacter
                     setNextCharacter()
                     if (currentCharacter == 'd') {
                         lexema += currentCharacter
