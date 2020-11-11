@@ -18,13 +18,97 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
     }
 
     /**
-     * <CompilationUnit> ::= <FunctionsList>
+     * <CompilationUnit> ::= [<VariableDeclarationList> ] <FunctionsList>
      */
     fun isCompilationUnit():CompilationUnit?{
+        val variableDeclarationList:ArrayList<VariableDeclaration> = isVariableDeclarationList()
         val functionsList:ArrayList<Function> = isFunctionList()
         return if(functionsList.size>0){
-            CompilationUnit(functionsList)
+            CompilationUnit(functionsList, variableDeclarationList)
         }else null
+    }
+
+    /**
+     * <VariableDeclarationList> ::= <VariableDeclaration>[<VariableDeclarationList>]
+     */
+    fun isVariableDeclarationList():ArrayList<VariableDeclaration>{
+        var variableDeclarationList = ArrayList<VariableDeclaration>()
+        var variableDeclaration = isVariableDeclaration()
+        while(variableDeclaration!=null){
+            variableDeclarationList.add(variableDeclaration)
+            if(currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "tutti"){
+                break
+            }
+            variableDeclaration = isVariableDeclaration()
+        }
+        return variableDeclarationList
+    }
+
+    /**
+     * <VariableDeclaration> ::= <DataType> tutti ";" <IdentifiersList> " \ "
+     */
+    fun isVariableDeclaration():VariableDeclaration?{
+
+        var dataType = isDataType()
+        if(dataType !=null){
+            setNextToken()
+            if(currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "tutti"){
+                setNextToken()
+                if(currentToken.category == Category.DOS_PUNTOS){
+                    setNextToken()
+                    var identifierList = isIdentifierList()
+                    if(identifierList.size > 0){
+                        if(currentToken.category == Category.TERMINAL){
+                            setNextToken()
+                            return VariableDeclaration(dataType,identifierList)
+                        }else{
+                            reportError("Falta el terminal \\")
+                        }
+                    }else{
+                        reportError("Faltan los identificadores")
+                    }
+                }else{
+                    reportError("Faltan ;")
+                }
+            }else{
+                reportError("Falta la palabra reservada")
+            }
+        }else{
+            reportError("Falta el tipo de dato")
+        }
+        return null
+    }
+
+    /**
+     * <IdentifierList> ::= identifier ["_"<IdentifierList>]
+     */
+    fun isIdentifierList():ArrayList<Token>{
+        var identifierList = ArrayList<Token>()
+        var identifier:Token ?
+        if(currentToken.category == Category.IDENTIFICADOR){
+            identifier = currentToken
+            setNextToken()
+        }else{
+            identifier = null
+        }
+        while(identifier != null){
+            identifierList.add(identifier)
+            if (currentToken.category == Category.SEPARADOR){
+                setNextToken()
+                identifier = if(currentToken.category == Category.IDENTIFICADOR){
+                    setNextToken()
+                    currentToken
+                }else{
+                    null
+                }
+            }else if(currentToken.category == Category.TERMINAL){
+                break
+            }else{
+                reportError("Falta separador")
+                break
+            }
+        }
+        return identifierList
     }
 
     /**
@@ -49,12 +133,11 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
     }
 
     /**
-     * <Function> ::= tutti identifier "["[<ParamList>]"]" <StatementBlock> <ReturnType> |
-     *                  solo identifier "["[<ParamList>]"]" <StatementBlock> <ReturnType> |
-     *                  proteto identifier "["[<ParamList>]"]" <StatementBlock> <ReturnType>
+     * <Function> ::= tutti identifier "["[<ParamList>]"]" <StatementBlock> <ReturnType>
+     *
      */
     fun isFunction():Function?{
-        if(currentToken.category == Category.PALABRA_RESERVADA && (currentToken.lexema == "tutti" || currentToken.lexema == "solo" || currentToken.lexema == "proteto")){
+        if(currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "tutti" ){
             setNextToken()
             if(currentToken.category == Category.IDENTIFICADOR ){
                 var identifier = currentToken
@@ -114,6 +197,20 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
     }
     fun isStatementList():ArrayList<Statement>{
         return ArrayList()
+    }
+
+    /**
+     * <DataType> ::= becu | bemol | ante | bridge | pulso | largo
+     */
+    fun isDataType():Token?{
+        if(currentToken.category == Category.PALABRA_RESERVADA){
+            if(currentToken.lexema == "becu" || currentToken.lexema=="pulso"
+                    ||currentToken.lexema == "largo" || currentToken.lexema == "ante"
+                    || currentToken.lexema == "bridge"){
+                return currentToken
+            }
+        }
+        return null
     }
 
     /**

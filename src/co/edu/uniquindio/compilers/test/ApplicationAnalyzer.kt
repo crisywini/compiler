@@ -4,7 +4,8 @@ import co.edu.uniquindio.compilers.lexicalAnalyzer.LexicalAnalyzer
 import co.edu.uniquindio.compilers.syntacticAnalyzer.SyntacticAnalyzer
 
 fun main(){
-    val lexico = LexicalAnalyzer("tutti ~isPrime[]<>becu ")
+    //     * <VariableDeclaration> ::= <DataType> tutti ";" <IdentifiersList> " \ "
+    val lexico = LexicalAnalyzer("becu tutti ; ~hola_~hola2\\ becu tutti ; ~hola_~hola2\\  becu tutti ; ~hola_~hola2\\ becu tutti ; ~hola_~hola2\\ tutti ~isPrime[]<>becu ")
     lexico.analyze()
     //print(lexico.tokenList)
     val sintactico = SyntacticAnalyzer(lexico.tokenList)
