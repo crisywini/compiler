@@ -78,7 +78,6 @@ class InitViewController {
     fun initizalize(){
         initTokensTableView()
         initErrorsTableView()
-        imageButton.image = Image(App::class.java.getResourceAsStream("/analyzer.png"))
     }
 
     /**

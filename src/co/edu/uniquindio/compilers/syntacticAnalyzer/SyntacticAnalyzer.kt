@@ -45,18 +45,65 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
     }
 
     /**
-     * <VariableDeclaration> ::= <DataType> tutti ";" <IdentifiersList> " \ "
+     * <VariableDeclaration> ::= <MutableVariableDeclaration>|<ImmutableVariableDeclaration>
      */
     fun isVariableDeclaration():VariableDeclaration?{
 
-        var dataType = isDataType()
+        var variableDeclaration = isMutableVariableDeclaration()
+        return if(variableDeclaration!=null){
+            variableDeclaration
+        }else{
+            variableDeclaration = isImmutableVariableDeclaration()
+            variableDeclaration
+        }
+    }
+
+    /**
+     * <MutableVariableDeclaration> ::= <DataType> tutti ";" <IdentifiersList> " \ "
+     */
+    fun isMutableVariableDeclaration():VariableDeclaration? {
+        val dataType = isDataType()
         if(dataType !=null){
             setNextToken()
             if(currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "tutti"){
                 setNextToken()
                 if(currentToken.category == Category.DOS_PUNTOS){
                     setNextToken()
-                    var identifierList = isIdentifierList()
+                    val identifierList = isIdentifierList()
+                    if(identifierList.size > 0){
+                        if(currentToken.category == Category.TERMINAL){
+                            setNextToken()
+                            return VariableDeclaration(dataType,identifierList)
+                        }else{
+                            reportError("Falta el terminal \\")
+                        }
+                    }else{
+                        reportError("Faltan los identificadores")
+                    }
+                }else{
+                    reportError("Faltan ;")
+                }
+            }else{
+                reportError("Falta la palabra reservada")
+            }
+        }else{
+            reportError("Falta el tipo de dato")
+        }
+        return null
+    }
+
+    /**
+     *  <ImmutableVariableDeclaration> ::= <DataType> solo ";" <IdentifiersList> " \ "
+     */
+    fun isImmutableVariableDeclaration():VariableDeclaration?{
+        val dataType = isDataType()
+        if(dataType !=null){
+            setNextToken()
+            if(currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "solo"){
+                setNextToken()
+                if(currentToken.category == Category.DOS_PUNTOS){
+                    setNextToken()
+                    val identifierList = isIdentifierList()
                     if(identifierList.size > 0){
                         if(currentToken.category == Category.TERMINAL){
                             setNextToken()
@@ -195,8 +242,73 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
         }
         return null
     }
+
+    /**
+     * <StatementList> ::= <Statement> [<StatementList>]
+     */
     fun isStatementList():ArrayList<Statement>{
-        return ArrayList()
+        val statementList = ArrayList<Statement>()
+        var statement = isStatement()
+        while(statement != null){
+            statementList.add(statement)
+            statement = isStatement()
+        }
+        return statementList
+    }
+
+    /**
+     * <Statement> ::= <Decision> | <VariableDeclaration> | <Assignment> | <Print> | <Cycle>
+     *                  | <Return> | <Input> | <FunctionInvocation> | <Increment> | <Decrement>
+     */
+    fun isStatement():Statement?{
+        var statement:Statement? = isVariableDeclaration()
+
+        if(statement != null){
+            return statement
+        }
+        statement = isAssignment()
+        if(statement != null){
+            return statement
+        }
+
+        return null
+    }
+
+    /**
+     * <Assignment>::= Identifier AssignmentOperator <Expression> “\”
+     */
+    fun isAssignment():Assignment?{
+        if(currentToken.category == Category.IDENTIFICADOR){
+            var identifier = currentToken
+            setNextToken()
+            if(currentToken.category == Category.OPERADOR_ASIGNACION){
+                setNextToken()
+                var expression = isExpression()
+                if(expression !=null){
+                    setNextToken()
+                    if(currentToken.category == Category.TERMINAL){
+                        setNextToken()
+                        return Assignment(identifier, expression)
+                    }else{
+                        reportError("Falta el terminal")
+                    }
+                }else{
+                    reportError("Falta la expresión")
+                }
+            }else{
+                reportError("Falta el operador de asignación")
+            }
+        }else{
+            reportError("Falta el identificador")
+        }
+        return null
+    }
+
+    /**
+     * <Expression> ::= <ArithmeticExpression> | <RelationalExpression> | <LogicExpression> | <StringExpression>
+     */
+    fun isExpression():Expression?{
+        return null
     }
 
     /**

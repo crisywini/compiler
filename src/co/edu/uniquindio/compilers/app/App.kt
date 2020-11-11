@@ -24,7 +24,7 @@ class App : Application(){
         val loader = FXMLLoader(App::class.java.getResource("/RootView.fxml"))
         val parent:Parent = loader.load()
         val controller:RootViewController= loader.getController()
-        controller.showInitView()
+        controller.initViewController.initizalize()
         val scene = Scene(parent)
         //Operador para variables que pueden ser nulas
         primaryStage?.scene = scene
