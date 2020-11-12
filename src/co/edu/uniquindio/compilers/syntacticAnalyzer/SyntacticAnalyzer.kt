@@ -222,10 +222,49 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
             return null
         }
 
+    /**
+     * <parametro> ::= <TipoDato> identificador
+     * <TipoDato> ::= becu | bemol | ante | bridge | pulso | largo
+     */
+    fun isParam():Param?{
+
+        val dataType = isDataType()
+        val name = currentToken
+        if(dataType != null) {
+            setNextToken()
+            if (currentToken.category == Category.IDENTIFICADOR) {
+                setNextToken()
+
+                return Param(name, dataType)
+            } else {
+                reportError("Falta el tipo de parámetro")
+            }
+        } else {
+            reportError("Falta el tipo de dato")
+        }
+        return null
+    }
 
 
+    /**
+    * <ParamList> ::= <Param>|["_"<ParamList>]
+     */
     fun isParamList():ArrayList<Param>{//Debe retornar una lista de parametros
-        return ArrayList()
+        var paramList = ArrayList<Param>()
+        var param = isParam()
+
+        while(param!=null){
+            paramList.add(param)
+            if(currentToken.category==Category.SEPARADOR){
+                setNextToken()
+                param = isParam()
+            } else {
+                reportError("Falta un separador en la lista de parámetros")
+                break
+            }
+            param = isParam()
+        }
+        return paramList
     }
 
     /**
