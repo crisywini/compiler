@@ -344,9 +344,43 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
     }
 
     /**
-     * <Expression> ::= <ArithmeticExpression> | <RelationalExpression> | <LogicExpression> | <StringExpression>
+     * <Expression> ::= <ArithmeticExpression> | <RelationalExpression> |
+     *                      <LogicExpression> | <StringExpression>
      */
     fun isExpression():Expression?{
+
+        var expression = isArithmeticExpression()
+        if(expression != null){
+            return  expression
+        }
+        expression = isRelationalExpression()
+
+        if(expression!= null){
+            return expression
+        }
+        expression = isLogicalExpression()
+
+        if(expression != null){
+           return expression
+        }
+        expression = isStringExpression()
+
+        if(expression != null){
+            return expression
+        }
+
+        return null
+    }
+    fun isStringExpression():Expression?{
+        return null
+    }
+    fun isLogicalExpression():Expression?{
+        return null
+    }
+    fun isArithmeticExpression():Expression?{
+        return null
+    }
+    fun isRelationalExpression():Expression?{
         return null
     }
 
