@@ -4,6 +4,7 @@ import co.edu.uniquindio.compilers.app.App
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
+import javafx.scene.control.Alert
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.BorderPane
 
@@ -19,5 +20,14 @@ import javafx.scene.layout.BorderPane
 class RootViewController {
     @FXML lateinit var rootPane:BorderPane
     @FXML lateinit var initViewController: InitViewController
-
+    companion object{
+        @JvmStatic
+        fun showAlert(contentText:String, title:String, type:Alert.AlertType){
+            var alert = Alert(type)
+            alert.contentText = contentText
+            alert.title = title
+            alert.headerText = ""
+            alert.showAndWait()
+        }
+    }
 }
