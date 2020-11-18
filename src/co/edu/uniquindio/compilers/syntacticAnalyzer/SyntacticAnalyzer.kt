@@ -464,7 +464,39 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
     fun isStringExpression():Expression?{
         return null
     }
-    fun isLogicalExpression():Expression?{
+
+
+    /**
+     * <LogicalExpression> ::= <LogicalExpression> LogicalOperator <LogicalExpression> |
+     *                      <RelationalExpression> LogicalOperator <RelationalExpression>
+     *
+     * Equivalent to:
+     *
+     * <LogicalExpression> ::=  <RelationalExpression> LogicalOperator <RelationalExpression> [ LogicalOperator <LogicalExpression> ]
+     *
+     */
+    fun isLogicalExpression():LogicalExpression?{
+        val relationalExpression1 = isRelationalExpression()
+        if(relationalExpression1 != null){
+            setNextToken()
+            if(currentToken.category == Category.OPERADOR_LOGICO){
+                val operator1 = currentToken
+                val relationalExpression2 = isRelationalExpression()
+                if(relationalExpression2 != null){
+                    setNextToken()
+                    if(currentToken.category == Category.OPERADOR_LOGICO){
+                        val operator2 = currentToken
+                        setNextToken()
+                        val logicalExpression = isLogicalExpression()
+                        if(logicalExpression != null){
+                            return LogicalExpression(relationalExpression1, operator1, relationalExpression2, operator2, logicalExpression)
+                        }else{
+                            return LogicalExpression(relationalExpression1, operator1, relationalExpression2)
+                        }
+                    }
+                }
+            }
+        }
         return null
     }
 
