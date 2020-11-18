@@ -1,9 +1,15 @@
 package co.edu.uniquindio.compilers.test
 
 import co.edu.uniquindio.compilers.lexicalAnalyzer.LexicalAnalyzer
+import co.edu.uniquindio.compilers.syntacticAnalyzer.SyntacticAnalyzer
 
 fun main(){
-    val lexico = LexicalAnalyzer("           4654.64    asd asd321 654\nasdasdasd789654")
+    // <VariableDeclaration> ::= <DataType> tutti ";" <IdentifiersList> " \ "
+    val lexico = LexicalAnalyzer("becu tutti ; ~hola_~hola2\\ tutti ~isPrime[]<>becu")
     lexico.analyze()
-    print(lexico.tokenList)
+    //print(lexico.tokenList)
+    val sintactico = SyntacticAnalyzer(lexico.tokenList)
+    print(sintactico.isParam())
+    println(sintactico.isCompilationUnit())
+    println(sintactico.errorList)
 }

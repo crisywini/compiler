@@ -4,6 +4,7 @@ import co.edu.uniquindio.compilers.app.App
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
+import javafx.scene.control.Alert
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.BorderPane
 
@@ -18,17 +19,15 @@ import javafx.scene.layout.BorderPane
  */
 class RootViewController {
     @FXML lateinit var rootPane:BorderPane
-    lateinit var intView:AnchorPane
-    lateinit var initViewController: InitViewController
-
-    /**
-     * Show Init View method
-     */
-    fun showInitView(){
-        val loader = FXMLLoader(App::class.java.getResource("/InitView.fxml"))
-        val initView: Parent = loader.load()
-        val controller:InitViewController = loader.getController()
-        controller.initizalize()
-        rootPane.center=initView
+    @FXML lateinit var initViewController: InitViewController
+    companion object{
+        @JvmStatic
+        fun showAlert(contentText:String, title:String, type:Alert.AlertType){
+            var alert = Alert(type)
+            alert.contentText = contentText
+            alert.title = title
+            alert.headerText = ""
+            alert.showAndWait()
+        }
     }
 }
