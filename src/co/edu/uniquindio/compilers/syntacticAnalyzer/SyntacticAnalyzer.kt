@@ -10,11 +10,29 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
     var currentToken:Token = tokenList[0]
     var errorList = ArrayList<Error>()
 
-    fun setNextToken(){
+    /**
+     * This method allows to set the current token to the next token
+     */
+    private fun setNextToken(){
         currentPosition ++
         if(currentPosition<tokenList.size){
             currentToken = tokenList[currentPosition]
         }
+    }
+
+    /**
+     * This method allows to do backtracking at one initial position
+     */
+    private fun doBacktracking(initialPosition:Int){
+        currentPosition = initialPosition
+        currentToken = tokenList[currentPosition]
+    }
+
+    /**
+     * This method allows to save an error in the error list
+     */
+    private fun reportError(message:String){
+        errorList.add(Error(message, currentToken.row, currentToken.column, ErrorCategory.ERROR_SINTACTICO))
     }
 
     /**
@@ -86,8 +104,6 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
             }else{
                 reportError("Falta la palabra reservada")
             }
-        }else{
-            reportError("Falta el tipo de dato")
         }
         return null
     }
@@ -120,8 +136,6 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
             }else{
                 reportError("Falta la palabra reservada")
             }
-        }else{
-            reportError("Falta el tipo de dato")
         }
         return null
     }
@@ -175,11 +189,9 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
         return functionList
     }
 
-    fun reportError(message:String){
-        errorList.add(Error(message, currentToken.row, currentToken.column, ErrorCategory.ERROR_SINTACTICO))
-    }
-
-    /**
+    /**else{
+            reportError("Falta el tipo de dato")
+        }
      * <Function> ::= tutti identifier "["[<ParamList>]"]" <StatementBlock> <ReturnType>
      *
      */
@@ -216,8 +228,6 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
                     }else{
                         reportError("Falta el identificador")
                     }
-                }else{
-                    reportError("Falta la palabra reservada")
                 }
             return null
         }
@@ -239,8 +249,6 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
             } else {
                 reportError("Falta el tipo de parámetro")
             }
-        } else {
-            reportError("Falta el tipo de dato")
         }
         return null
     }
@@ -349,7 +357,7 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
      */
     fun isExpression():Expression?{
 
-        var expression = isArithmeticExpression()
+        var expression:Expression? = isArithmeticExpression()
         if(expression != null){
             return  expression
         }
@@ -371,16 +379,126 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
 
         return null
     }
+
+    /**
+     * <ArithmeticExpression> ::= “[“ <ArithmeticExpression> “]” |
+     *                            <ArithmeticExpression> ArithmeticOperator <ArithmeticExpression> |
+     *                            <Number> |
+     *                            identifier
+     *
+     * <ArithmeticExpression> ::= “[“ <ArithmeticExpression> “]”[ArithmeticOperator <ArithmeticExpression>] |
+     *                          <Number>[ArithmeticOperator <ArithmeticExpression>]   |
+     *                          identifier[ArithmeticOperator <ArithmeticExpression>]
+     */
+    fun isArithmeticExpression():ArithmeticExpression?{
+        if(currentToken.category == Category.PARENTESIS_IZQUIERDO){
+            setNextToken()
+            val expression1 = isArithmeticExpression()
+
+            if(expression1 != null){
+                if(currentToken.category == Category.PARENTESIS_DERECHO){
+                    setNextToken()
+                    if(currentToken.category == Category.OPERADOR_ARITMETICO){
+                        val operator = currentToken
+                        setNextToken()
+                        val expression2 = isArithmeticExpression()
+                        if(expression2!=null) {
+                            return ArithmeticExpression(expression1, operator, expression2)
+                        }
+                    }else{
+                        return ArithmeticExpression(expression1)
+                    }
+                }
+            }
+        }else{
+            val number = isNumericValue()
+            if(number != null){
+                setNextToken()
+                if(currentToken.category == Category.OPERADOR_ARITMETICO){
+                    val operator = currentToken
+                    setNextToken()
+                    val expression = isArithmeticExpression()
+                    if(expression!=null) {
+                        return ArithmeticExpression(number, operator, expression)
+                    }
+                }else{
+                    return ArithmeticExpression(number)
+                }
+            }else{
+                if(currentToken.category == Category.IDENTIFICADOR){
+                    val identifier = currentToken
+                    setNextToken()
+                    if(currentToken.category == Category.OPERADOR_ARITMETICO){
+                        val operator = currentToken
+                        setNextToken()
+                        val expression = isArithmeticExpression()
+                        if(expression!=null) {
+                            return ArithmeticExpression(identifier, operator, expression)
+                        }
+                    }else{
+                        return ArithmeticExpression(identifier)
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    /**
+     * <NumericValue> ::= [<Sign>] Int | [<Sign>] Decimal | [<Sign>] Identifier
+     * <Sig> ::=  “'“ | "*"
+     */
+    fun isNumericValue():NumericValue?{
+        val sign:Token? = null
+        if((currentToken.category == Category.OPERADOR_ARITMETICO && currentToken.lexema == "\'") ||
+                (currentToken.category == Category.OPERADOR_ARITMETICO && currentToken.lexema == "*")){
+            val sign = currentToken
+            setNextToken()
+        }
+        if(currentToken.category == Category.ENTERO || currentToken.category == Category.IDENTIFICADOR || currentToken.category == Category.DECIMAL){
+            val term = currentToken
+            return NumericValue(sign, term)
+        }
+        return null
+    }
     fun isStringExpression():Expression?{
         return null
     }
     fun isLogicalExpression():Expression?{
         return null
     }
-    fun isArithmeticExpression():Expression?{
-        return null
-    }
-    fun isRelationalExpression():Expression?{
+
+    /**
+     * <RelationalExpression> ::= <RelationalExpression> RelationalOperator <RelationalExpression>  |
+     *                            <ArithmeticExpression> RelationalOperator <ArithmeticExpression>
+     *
+     * Equivalent to:
+     *
+     * <RelationalExpression> ::= <ArithmeticExpression> RelationalOperator <ArithmeticExpression> [RelationalOperator <RelationalExpression>]
+     *
+     */
+    fun isRelationalExpression():RelationalExpression?{
+        val arithmeticExpression1 = isArithmeticExpression()
+        if(arithmeticExpression1 != null){
+            setNextToken()
+            if(currentToken.category == Category.OPERADORES_RELACIONALES){
+                val operator1 = currentToken
+                setNextToken()
+                val arithmeticExpression2 = isArithmeticExpression()
+                if(arithmeticExpression2 != null){
+                    setNextToken()
+                    if(currentToken.category == Category.OPERADORES_RELACIONALES){
+                        val operator2 = currentToken
+                        val relationalExpression = isRelationalExpression()
+                        return if(relationalExpression != null){
+                            RelationalExpression(arithmeticExpression1, operator1, arithmeticExpression2, operator2, relationalExpression)
+                        }else{
+                            RelationalExpression(arithmeticExpression1, operator1, arithmeticExpression2)
+                        }
+                    }
+                }
+            }
+        }
         return null
     }
 
