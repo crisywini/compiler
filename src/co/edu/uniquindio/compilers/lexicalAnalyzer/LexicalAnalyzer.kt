@@ -66,6 +66,8 @@ class LexicalAnalyzer(var sourceCode: String) {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
+            var actual = actualPosition
+            var isError = false
 
             lexema += currentCharacter
             setNextCharacter()
@@ -78,6 +80,15 @@ class LexicalAnalyzer(var sourceCode: String) {
                     if (currentCharacter.isDigit()) {
                         lexema += currentCharacter
                         setNextCharacter()
+                    }
+                    else{
+                        isError = true
+                    }
+                    if (isError) {
+                        lexema += currentCharacter
+                        setNextCharacter()
+                        storeError(lexema, initialRow, initialColumn, ErrorCategory.ERROR_LEXICO)
+                        return true
                     }
                 } else {
                     lexema += currentCharacter
@@ -100,6 +111,9 @@ class LexicalAnalyzer(var sourceCode: String) {
 
                 storeToken(lexema, Category.DECIMAL, initialRow, initialColumn)
                 return true
+            }
+            else {
+                doBackTracking(actual, initialRow, initialColumn)
             }
         }
         return false
@@ -129,18 +143,25 @@ class LexicalAnalyzer(var sourceCode: String) {
             var isError = false
             lexema += currentCharacter
             setNextCharacter()//Cambiar nombre a actualizar caracter
-            while (currentCharacter != ')') {
+            while (currentCharacter != ')' && currentCharacter != endCode) {
                 lexema += currentCharacter
                 setNextCharacter()//Cambiar nombre a actualizar caracter
                 if (currentCharacter == '°') {
                     lexema += currentCharacter
                     setNextCharacter()
                     if (currentCharacter != 'n' && currentCharacter != 't' && currentCharacter != 'b'
-                            && currentCharacter != 'r' && currentCharacter != '(' || currentCharacter != ')'
+                            && currentCharacter != 'r' && currentCharacter != '(' && currentCharacter != ')'
                             && currentCharacter != '?' && currentCharacter != '¿') {
                         isError = true
                     }
+                }else {
+                    if (currentCharacter == '(') {
+                        isError = true
+                    }
                 }
+            }
+            if(currentCharacter==endCode){
+                isError = true
             }
             if (isError) {
                 lexema += currentCharacter
@@ -589,7 +610,7 @@ class LexicalAnalyzer(var sourceCode: String) {
                 lexema += currentCharacter
                 setNextCharacter()
                 if (currentCharacter == 'n') {
-                    lexema += currentCharacterCopy
+                    lexema += currentCharacter
                     setNextCharacter()
                     if (currentCharacter == 'd') {
                         lexema += currentCharacter
@@ -839,6 +860,9 @@ class LexicalAnalyzer(var sourceCode: String) {
                 storeToken(lexema, Category.ENTERO, initialRow, initialColumn)
                 return true
             }
+            else {
+                doBackTracking(initialPosition, initialRow, initialColumn)
+            }
         }
         //RI -> Rechazo Inmediato
         return false
@@ -1020,52 +1044,66 @@ class LexicalAnalyzer(var sourceCode: String) {
             lexema += currentCharacter
             setNextCharacter()//Cambiar nombre a actualizar caracter
 
-            if (currentCharacter !='?' && currentCharacter !='°' ) {
-                lexema += currentCharacter
-                setNextCharacter()//Cambiar nombre a actualizar caracter
+            if(currentCharacter==endCode || currentCharacter =='?'  || currentCharacter ==' ' ) {
 
-                if(currentCharacter !='?') {
-                    isError=true
+                if (currentCharacter == endCode) {
+                    isError = true
+                }
+                if (currentCharacter == '?') {
+                    isError = true
+                }
+                if (currentCharacter == ' ') {
+                    lexema += currentCharacter
+                    setNextCharacter()
 
-                    while(currentCharacter !='?'){
-                        lexema += currentCharacter
-                        setNextCharacter()//Cambiar nombre a actualizar caracter
+                    if (currentCharacter == '?') {
+                        isError = true
                     }
                 }
             }
             else {
-
-                if (currentCharacter == '°') {
+                if (currentCharacter != '?' && currentCharacter != '°') {
                     lexema += currentCharacter
                     setNextCharacter()//Cambiar nombre a actualizar caracter
-                    if (currentCharacter == 'n' || currentCharacter == 't' || currentCharacter == 'b'
-                            || currentCharacter == 'r' || currentCharacter == '(' || currentCharacter == ')'
-                            || currentCharacter == '?' || currentCharacter == '¿') {
 
-                        lexema += currentCharacter
-                        setNextCharacter()//Cambiar nombre a actualizar caracter
-                        if(currentCharacter != '?')
-                        {
-                            isError=true
+                    if (currentCharacter != '?') {
+                        isError = true
 
-                            while(currentCharacter !='?'){
-                                lexema += currentCharacter
-                                setNextCharacter()//Cambiar nombre a actualizar caracter
-                            }
-                        }
-
-                    }
-                    else {
-                        isError=true
-                        while(currentCharacter !='?'){
+                        while (currentCharacter != '?') {
                             lexema += currentCharacter
                             setNextCharacter()//Cambiar nombre a actualizar caracter
                         }
                     }
+                } else {
+
+                    if (currentCharacter == '°') {
+                        lexema += currentCharacter
+                        setNextCharacter()//Cambiar nombre a actualizar caracter
+                        if (currentCharacter == 'n' || currentCharacter == 't' || currentCharacter == 'b'
+                                || currentCharacter == 'r' || currentCharacter == '(' || currentCharacter == ')'
+                                || currentCharacter == '?' || currentCharacter == '¿') {
+
+                            lexema += currentCharacter
+                            setNextCharacter()//Cambiar nombre a actualizar caracter
+                            if (currentCharacter != '?') {
+                                isError = true
+
+                                while (currentCharacter != '?') {
+                                    lexema += currentCharacter
+                                    setNextCharacter()//Cambiar nombre a actualizar caracter
+                                }
+                            }
+
+                        } else {
+                            isError = true
+                            while (currentCharacter != '?') {
+                                lexema += currentCharacter
+                                setNextCharacter()//Cambiar nombre a actualizar caracter
+                            }
+                        }
+                    }
                 }
             }
-
-
             if (isError) {
                 lexema += currentCharacter
                 setNextCharacter()
