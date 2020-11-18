@@ -143,6 +143,9 @@ class LexicalAnalyzer(var sourceCode: String) {
             var isError = false
             lexema += currentCharacter
             setNextCharacter()//Cambiar nombre a actualizar caracter
+            if(currentCharacter == '('){
+                isError = true
+            }
             while (currentCharacter != ')' && currentCharacter != endCode) {
                 lexema += currentCharacter
                 setNextCharacter()//Cambiar nombre a actualizar caracter
