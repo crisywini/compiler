@@ -154,6 +154,10 @@ class LexicalAnalyzer(var sourceCode: String) {
                             && currentCharacter != '?' && currentCharacter != '¿') {
                         isError = true
                     }
+                }else {
+                    if (currentCharacter == '(') {
+                        isError = true
+                    }
                 }
             }
             if(currentCharacter==endCode){
