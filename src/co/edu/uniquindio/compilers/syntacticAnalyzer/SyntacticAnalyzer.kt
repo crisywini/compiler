@@ -223,6 +223,197 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
         }
 
     /**
+     * <Desicion> ::= eva “[“ <LogicalExpression> “]” <StatementBlock>  [contra  <StatementBlock>]
+     *
+     */
+
+    fun isDecision():Decision? {
+        if (currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "eva") {
+            setNextToken()
+            if (currentToken.category == Category.PARENTESIS_IZQUIERDO) {
+                setNextToken()
+                var expression = isLogicalExpression()
+                if (expression != null) {
+                    if (currentToken.category == Category.PARENTESIS_DERECHO) {
+                        setNextToken()
+                        var statementBlock = isStatementBlock()
+                        if(statementBlock != null){
+                            if (currentToken.lexema == "contra") {
+                                setNextToken()
+                                var statementBlock2 = isStatementBlock()
+                                if(statementBlock2 != null) {
+                                    return Decision(expression, statementBlock,statementBlock2)
+                                }
+                            } else{
+                                return Decision(expression, statementBlock,null)
+                            }
+                        }else{
+                            reportError("Falta bloque de sentencias")
+                        }
+                    }else{
+                        reportError("Falta parentesis derecho")
+                    }
+                }else{
+                    reportError("Falta la expresion")
+                }
+            }else{
+                reportError("Falta parentesis izquierdo")
+            }
+        }
+        return null;
+    }
+
+    /**
+     * <CycleWhile>::= Rondo “[” <logicalExpression> “]” <StatementBlock>
+     *
+     */
+    fun isCycle():Cycle? {
+        if (currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "rondo") {
+            setNextToken()
+            if (currentToken.category == Category.PARENTESIS_IZQUIERDO) {
+                setNextToken()
+                var expression = isLogicalExpression()
+                if (expression != null) {
+                    if (currentToken.category == Category.PARENTESIS_DERECHO) {
+                        setNextToken()
+                        var statementBlock = isStatementBlock()
+                        if(statementBlock != null) {
+                            return Cycle(expression, statementBlock)
+                        }else{
+                            reportError("Falta bloque de sentencias")
+                        }
+                    }else{
+                        reportError("Falta parentesis derecho")
+                    }
+                }else{
+                    reportError("Falta la expresion del ciclo")
+                }
+            }else{
+                reportError("Falta parentesis izquierdo")
+            }
+        }else{
+            reportError("Falta la palabra reservada")
+        }
+        return null
+    }
+
+    /**
+     * <Read>::= Proteto “[“ identifier “]” “\”
+     *
+     */
+    fun isRead():Read? {
+        if (currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "proteto") {
+            setNextToken()
+            if (currentToken.category == Category.PARENTESIS_IZQUIERDO) {
+                setNextToken()
+                if(currentToken.category == Category.IDENTIFICADOR ) {
+                    var identifier = currentToken
+                    setNextToken()
+                    if (currentToken.category == Category.PARENTESIS_DERECHO) {
+                        setNextToken()
+                        if(currentToken.category == Category.TERMINAL){
+                            setNextToken()
+                            return Read(identifier)
+                        }else{
+                            reportError("Falta el terminal")
+                        }
+                    }else{
+                        reportError("Falta parentesis derecho")
+                    }
+                }else{
+                    reportError("Falta el identificador")
+                }
+            }else{
+                reportError("Falta parentesis izquierdo")
+            }
+        }else{
+            reportError("Falta palabra reservada")
+        }
+        return null
+    }
+    /**
+     * <FunctionInvocation>::= identifier “[“ [<argumentList>] “]” “\”
+     * Donde está el proyecto? en escritorio 
+     */
+    fun isFunctionInvocation():FunctionInvocation? {
+
+        if(currentToken.category == Category.IDENTIFICADOR ) {
+            var identifier = currentToken
+            setNextToken()
+            if (currentToken.category == Category.PARENTESIS_IZQUIERDO) {
+                setNextToken()
+                var argumentList = isArgumentList()
+                if(currentToken.category == Category.PARENTESIS_DERECHO) {
+                    setNextToken()
+                    if(currentToken.category == Category.TERMINAL){
+                        setNextToken()
+                        return FunctionInvocation(identifier,argumentList)
+                    }else{
+                        reportError("Falta el terminal")
+                    }
+                }else{
+                    reportError("Falta el parentesis derecho")
+                }
+            }else{
+                reportError("Falta el parentesis izquierdo")
+            }
+        }else{
+            reportError("Falta el identificador")
+        }
+        return null
+    }
+    /**
+     * <Increment>::= identifier IncrementOperator “\”
+     *
+     */
+    fun isIncrement():Increment? {
+
+        if(currentToken.category == Category.IDENTIFICADOR ) {
+            var identifier = currentToken
+            setNextToken()
+            if(currentToken.category == Category.OPERADOR_INCREMENTO ) {
+                setNextToken()
+                if(currentToken.category == Category.TERMINAL){
+                    setNextToken()
+                        return Increment(identifier)
+                }else{
+                    reportError("Falta el terminal")
+                }
+            }else{
+                reportError("Falta el operador de incremento")
+            }
+        }else{
+            reportError("Falta el identificador")
+        }
+        return null
+    }
+    /**
+     * <Decrement>::= identifier DecrementOperator “\”
+     *
+     */
+    fun isDecrement():Decrement? {
+
+        if(currentToken.category == Category.IDENTIFICADOR ) {
+            var identifier = currentToken
+            setNextToken()
+            if(currentToken.category == Category.OPERADOR_DECREMENTO ) {
+                setNextToken()
+                if(currentToken.category == Category.TERMINAL){
+                    setNextToken()
+                    return Decrement(identifier)
+                }else{
+                    reportError("Falta el terminal")
+                }
+            }else{
+                reportError("Falta el operador de decremento")
+            }
+        }else{
+            reportError("Falta el identificador")
+        }
+        return null
+    }
+
+    /**
      * <parametro> ::= <TipoDato> identificador
      * <TipoDato> ::= becu | bemol | ante | bridge | pulso | largo
      */
@@ -266,6 +457,18 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
         }
         return paramList
     }
+    /**
+     * <argument> ::= identificador | <Expression>
+     */
+    fun isArgument():Argument?{
+        return null
+    }
+    /**
+     * <argumentList> ::= <argument>|["_"<argumentList>]
+     */
+    fun isArgumentList(): ArrayList<Argument>? {
+        return null
+    }
 
     /**
      * <StatementBlock> ::= "<"[<StatementList>]">"
@@ -297,7 +500,7 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
 
     /**
      * <Statement> ::= <Decision> | <VariableDeclaration> | <Assignment> | <Print> | <Cycle>
-     *                  | <Return> | <Input> | <FunctionInvocation> | <Increment> | <Decrement>
+     *                  | <Return> | <Read> | <FunctionInvocation> | <Increment> | <Decrement>
      */
     fun isStatement():Statement?{
         var statement:Statement? = isVariableDeclaration()
@@ -305,10 +508,36 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
         if(statement != null){
             return statement
         }
+
+        statement = isDecision()
+        if(statement != null){
+            return statement
+        }
         statement = isAssignment()
         if(statement != null){
             return statement
         }
+        statement = isCycle()
+        if(statement != null){
+            return statement
+        }
+        statement = isRead()
+        if(statement != null){
+            return statement
+        }
+        statement = isFunctionInvocation()
+        if(statement != null){
+            return statement
+        }
+        statement = isIncrement()
+        if(statement != null){
+            return statement
+        }
+        statement = isDecrement()
+        if(statement != null){
+            return statement
+        }
+
 
         return null
     }
@@ -344,9 +573,16 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
     }
 
     /**
-     * <Expression> ::= <ArithmeticExpression> | <RelationalExpression> | <LogicExpression> | <StringExpression>
+     * <Expression> ::= <ArithmeticExpression> | <RelationalExpression> | <LogicalExpression> | <StringExpression>
      */
     fun isExpression():Expression?{
+        return null
+    }
+
+    /**
+     * <LogicalExpression> ::= <LogicalExpression> OperadorLogico <LogicalExpression> | <RelationalExpression> OperadorLogico <RelationalExpression>
+     */
+    fun isLogicalExpression():LogicalExpression?{
         return null
     }
 

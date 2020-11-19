@@ -9,7 +9,8 @@ fun main(){
     lexico.analyze()
     //print(lexico.tokenList)
     val sintactico = SyntacticAnalyzer(lexico.tokenList)
-    print(sintactico.isParam())
+    //print(sintactico.isParam())
     println(sintactico.isCompilationUnit())
-    println(sintactico.errorList)
+    //println(sintactico.isDecision())
+   // println(sintactico.errorList)
 }
