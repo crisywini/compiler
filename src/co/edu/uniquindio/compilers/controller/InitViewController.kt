@@ -57,6 +57,7 @@ class InitViewController:Initializable {
                 if (compilationUnit != null) {
                     treeView.root = compilationUnit.getTreeView()
                 }
+                fillErrorsTableView(lexical, syntactic)
             }else{
                 RootViewController.showAlert("Existen errores léxicos","ADVERTENCIA",Alert.AlertType.WARNING)
             }
@@ -86,6 +87,20 @@ class InitViewController:Initializable {
             errorsTableView.items.add(ErrorObservable(element.error, "".plus(element.row), "".plus(element.column)
                     , element.errorCategory.toString()))
         }
+
+        errorsTableView.refresh()
+    }
+
+    /**
+     * Fill Errors Table View method
+     */
+    private fun fillErrorsTableView(lexical:LexicalAnalyzer, syntacticAnalyzer: SyntacticAnalyzer){
+        errorsTableView.items.clear()
+        for(element in lexical.errorList){
+            errorsTableView.items.add(ErrorObservable(element.error, "".plus(element.row), "".plus(element.column)
+                    , element.errorCategory.toString()))
+        }
+
         errorsTableView.refresh()
     }
 
