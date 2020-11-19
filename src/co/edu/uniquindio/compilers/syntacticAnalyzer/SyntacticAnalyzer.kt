@@ -126,8 +126,8 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
     }
 
     /**
-     * <InicializaciónVariableInmutable> ::= <TipoDato>solo “;” identificador “:” <Valor> “\”
-        <Valor> ::= cadena | entero | decimal | boolean
+     * <ImmutableVariableInitialization> ::= <DataType> solo “;” identifier “:” <Value> “\”
+     *
      */
     fun isImmutableVariableInitialization():VariableInitialization?{
         val dataType = isDataType()
@@ -150,7 +150,11 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
                                 if(currentToken.category == Category.TERMINAL){
                                     setNextToken()
                                     return VariableInitialization(dataType, identifier,  value)
+                                }else{
+                                    reportError("Falta la terminal")
                                 }
+                            }else{
+                                reportError("Falta el valor de la variable")
                             }
                         }else{
                             doBacktracking(initialPosition2)
@@ -292,20 +296,19 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
                         }
                     }else{
                         reportError("Falta el paréntesis derecho")
-                            }
-                        }else{
-                            reportError("Falta el paréntesis izquierdo")
-                        }
-                    }else{
-                        reportError("Falta el identificador")
                     }
+                }else{
+                    reportError("Falta el paréntesis izquierdo")
                 }
-            return null
+            }else{
+                reportError("Falta el identificador")
+            }
         }
+        return null
+    }
 
     /**
-     * <Desicion> ::= eva “[“ <LogicalExpression> “]” <StatementBlock>  [contra  <StatementBlock>]
-     *
+     * <Decision> ::= eva “[“ <LogicalExpression> “]” <StatementBlock>  [contra  <StatementBlock>]
      */
 
     fun isDecision():Decision? {
@@ -587,7 +590,6 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
         if(statement != null){
             return statement
         }
-
         statement = isDecision()
         if(statement != null){
             return statement
