@@ -39,12 +39,13 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
      * <CompilationUnit> ::= [<VariableDeclarationList> ] <FunctionsList>
      */
     fun isCompilationUnit():CompilationUnit?{
-        val variableDeclarationList:ArrayList<VariableDeclaration> = isVariableDeclarationList()
+        val immutableVariableInitialization:ArrayList<VariableInitialization> = isImmutableVariableInitializationList()
         val functionsList:ArrayList<Function> = isFunctionList()
         return if(functionsList.size>0){
-            CompilationUnit(functionsList, variableDeclarationList)
+            CompilationUnit(functionsList, immutableVariableInitialization)
         }else null
     }
+
 
     /**
      * <VariableDeclarationList> ::= <VariableDeclaration>[<VariableDeclarationList>]
@@ -109,6 +110,76 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
     }
 
     /**
+     * <VariableInitializationList> ::= <ImmutableVariableInitialization>[<VariableInitializationList>]
+     */
+    fun isImmutableVariableInitializationList():ArrayList<VariableInitialization>{
+        val variableList:ArrayList<VariableInitialization> = ArrayList()
+        var variableInitialization = isImmutableVariableInitialization()
+        while(variableInitialization != null){
+            variableList.add(variableInitialization)
+            if(currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "tutti"){
+                break
+            }
+            variableInitialization = isImmutableVariableInitialization()
+        }
+        return variableList
+    }
+
+    /**
+     * <InicializaciónVariableInmutable> ::= <TipoDato>solo “;” identificador “:” <Valor> “\”
+        <Valor> ::= cadena | entero | decimal | boolean
+     */
+    fun isImmutableVariableInitialization():VariableInitialization?{
+        val dataType = isDataType()
+        if(dataType != null){
+            setNextToken()
+            val initialPosition1 = currentPosition
+            if(currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "solo"){
+                setNextToken()
+                if (currentToken.category == Category.DOS_PUNTOS){
+                    setNextToken()
+                    if(currentToken.category == Category.IDENTIFICADOR){
+                        val identifier = currentToken
+                        setNextToken()
+                        val initialPosition2 = currentPosition
+                        if(currentToken.category == Category.OPERADOR_ASIGNACION){
+                            setNextToken()
+                            val value = isValue()
+                            if(value != null){
+                                setNextToken()
+                                if(currentToken.category == Category.TERMINAL){
+                                    setNextToken()
+                                    return VariableInitialization(dataType, identifier,  value)
+                                }
+                            }
+                        }else{
+                            doBacktracking(initialPosition2)
+                        }
+                    }else{
+                        reportError("Falta el identificador")
+                    }
+                }else{
+                    reportError("Falta el ;")
+                }
+            }else{
+                doBacktracking(initialPosition1)
+            }
+        }
+        return null
+    }
+
+    /**
+     * <Value> ::= String | Integer | Decimal | Boolean
+     */
+    fun isValue():Token?{
+        if(currentToken.category == Category.CADENA_CARACTERES || currentToken.category == Category.DECIMAL || currentToken.category == Category.ENTERO
+                || (currentToken.category == Category.PALABRA_RESERVADA &&(currentToken.lexema == "and" || currentToken.lexema ==  "or"))){
+            return currentToken
+        }
+        return  null
+    }
+
+    /**
      *  <ImmutableVariableDeclaration> ::= <DataType> solo ";" <IdentifiersList> " \ "
      */
     fun isImmutableVariableDeclaration():VariableDeclaration?{
@@ -144,8 +215,8 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
      * <IdentifierList> ::= identifier ["_"<IdentifierList>]
      */
     fun isIdentifierList():ArrayList<Token>{
-        var identifierList = ArrayList<Token>()
-        var identifier:Token ?
+        val identifierList = ArrayList<Token>()
+        var identifier:Token?
         if(currentToken.category == Category.IDENTIFICADOR){
             identifier = currentToken
             setNextToken()
@@ -157,7 +228,6 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
             if (currentToken.category == Category.SEPARADOR){
                 setNextToken()
                 identifier = if(currentToken.category == Category.IDENTIFICADOR){
-                    setNextToken()
                     currentToken
                 }else{
                     null
@@ -168,6 +238,7 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
                 reportError("Falta separador")
                 break
             }
+            setNextToken()
         }
         return identifierList
     }

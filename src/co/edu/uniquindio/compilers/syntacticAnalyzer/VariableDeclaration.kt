@@ -10,7 +10,12 @@ class VariableDeclaration(var dataType:Token, var identifierList:ArrayList<Token
     }
     override fun getTreeView(): TreeItem<String> {
         val root: TreeItem<String> = TreeItem("Declaración Variable")
-
+        root.children.add(TreeItem("Tipo de dato: ${dataType.lexema}"))
+        val identifierRoot:TreeItem<String> = TreeItem<String>("Identificadores")
+        for(i in identifierList){
+            identifierRoot.children.add(TreeItem(i.lexema))
+        }
+        root.children.add(identifierRoot)
         return root
     }
 }
