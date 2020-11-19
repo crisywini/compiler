@@ -338,7 +338,7 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
                         reportError("Falta parentesis derecho")
                     }
                 }else{
-                    reportError("Falta la expresion")
+                    reportError("Falta la expresion logica")
                 }
             }else{
                 reportError("Falta parentesis izquierdo")
@@ -375,17 +375,16 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
             }else{
                 reportError("Falta parentesis izquierdo")
             }
-        }else{
-            reportError("Falta la palabra reservada")
         }
         return null
     }
 
     /**
-     * <Read>::= Proteto “[“ identifier “]” “\”
+     * <Read>::= Proteto “[“ identifier “]” “\\”
      *
      */
     fun isRead():Read? {
+
         if (currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "proteto") {
             setNextToken()
             if (currentToken.category == Category.PARENTESIS_IZQUIERDO) {
@@ -410,14 +409,12 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
             }else{
                 reportError("Falta parentesis izquierdo")
             }
-        }else{
-            reportError("Falta palabra reservada")
         }
         return null
     }
     /**
      * <FunctionInvocation>::= identifier “[“ [<argumentList>] “]” “\”
-     * Donde está el proyecto? en escritorio 
+     *
      */
     fun isFunctionInvocation():FunctionInvocation? {
 
@@ -472,7 +469,7 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
         return null
     }
     /**
-     * <Decrement>::= identifier DecrementOperator “\”
+     * <Decrement>::= identifier DecrementOperator “\\”
      *
      */
     fun isDecrement():Decrement? {
@@ -493,6 +490,87 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
             }
         }else{
             reportError("Falta el identificador")
+        }
+        return null
+    }
+    /**
+     * <Return>::= coda identifier “\\” | coda <expressión> “\\”
+     *
+     */
+    fun isReturn():Return? {
+        if (currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "coda") {
+            setNextToken()
+
+            if(currentToken.category == Category.IDENTIFICADOR ) {
+                var identifier = currentToken
+                setNextToken()
+                if(currentToken.category == Category.TERMINAL){
+                    setNextToken()
+                    return Return(identifier, null)
+                }else{
+                    reportError("Falta el terminal")
+                }
+            }else{
+                var expression = isExpression()
+                if (expression != null) {
+                    setNextToken()
+                    if(currentToken.category == Category.TERMINAL){
+                        setNextToken()
+                        return Return(null ,expression)
+                    }else{
+                        reportError("Falta el terminal")
+                    }
+                }else{
+                    reportError("Falta un identificador o una expresion")
+                }
+            }
+        }
+        return null
+    }
+    /**
+     * <Print>::= opus “[“ identifier “]” “\\” | opus “[“<Expression>“]” “\\”
+     *
+     */
+    fun isPrint():Print? {
+        if (currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "opus") {
+            setNextToken()
+            if (currentToken.category == Category.PARENTESIS_IZQUIERDO) {
+                setNextToken()
+
+                if (currentToken.category == Category.IDENTIFICADOR) {
+                    var identifier = currentToken
+                    setNextToken()
+                    if (currentToken.category == Category.PARENTESIS_DERECHO) {
+                        setNextToken()
+                        if (currentToken.category == Category.TERMINAL) {
+                            setNextToken()
+                            return Print(identifier, null)
+                        } else {
+                            reportError("Falta el terminal")
+                        }
+                    } else {
+                        reportError("Falta parentesis derecho")
+                    }
+                } else {
+                    var expression = isExpression()
+                    if (expression != null) {
+                        setNextToken()
+                        if (currentToken.category == Category.PARENTESIS_DERECHO) {
+                            setNextToken()
+                            if (currentToken.category == Category.TERMINAL) {
+                                setNextToken()
+                                return Print(null, expression)
+                            } else {
+                                reportError("Falta el terminal")
+                            }
+                        }else {
+                            reportError("Falta parentesis derecho")
+                        }
+                    } else {
+                        reportError("Falta un identificador o una expresion")
+                    }
+                }
+            }
         }
         return null
     }
@@ -615,6 +693,14 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
             return statement
         }
         statement = isDecrement()
+        if(statement != null){
+            return statement
+        }
+        statement = isReturn()
+        if(statement != null){
+            return statement
+        }
+        statement = isPrint()
         if(statement != null){
             return statement
         }
