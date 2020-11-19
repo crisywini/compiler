@@ -5,12 +5,13 @@ import co.edu.uniquindio.compilers.syntacticAnalyzer.SyntacticAnalyzer
 
 fun main(){
     // <VariableDeclaration> ::= <DataType> tutti ";" <IdentifiersList> " \ "
-    val lexico = LexicalAnalyzer("becu tutti ; ~hola_~hola2\\ tutti ~isPrime[]<>becu")
+    val lexico = LexicalAnalyzer(" tutti ~isPrime[]< rondo [ 5 or 7 ]  < bemol tutti ; ~hola\\ > >becu   ")
     lexico.analyze()
     //print(lexico.tokenList)
     val sintactico = SyntacticAnalyzer(lexico.tokenList)
     //print(sintactico.isParam())
-    println(sintactico.isCompilationUnit())
-    //println(sintactico.isDecision())
-   // println(sintactico.errorList)
+   println(sintactico.isCompilationUnit())
+   //println(sintactico.isFunction())
+   // println(sintactico.isCycle())
+   println(sintactico.errorList)
 }
