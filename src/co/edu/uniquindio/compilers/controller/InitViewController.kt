@@ -2,17 +2,20 @@ package co.edu.uniquindio.compilers.controller
 
 import co.edu.uniquindio.compilers.app.App
 import co.edu.uniquindio.compilers.lexicalAnalyzer.LexicalAnalyzer
+import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
 import co.edu.uniquindio.compilers.observables.ErrorObservable
 import co.edu.uniquindio.compilers.observables.TokenObservable
+import co.edu.uniquindio.compilers.syntacticAnalyzer.SyntacticAnalyzer
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
-import javafx.scene.control.TableColumn
-import javafx.scene.control.TableView
-import javafx.scene.control.TextArea
+import javafx.fxml.Initializable
+import javafx.scene.control.*
 
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
+import java.net.URL
+import java.util.*
 
 /**
  *
@@ -23,7 +26,7 @@ import javafx.scene.image.ImageView
  * @version 1.0
  *
  */
-class InitViewController {
+class InitViewController:Initializable {
 
     @FXML lateinit var sourceCodeTextArea: TextArea
     @FXML lateinit var tokensTableView: TableView<TokenObservable>
@@ -37,6 +40,7 @@ class InitViewController {
     @FXML lateinit var categoryErrorTableColumn: TableColumn<ErrorObservable, String>
     @FXML lateinit var rowErrorTableColumn: TableColumn<ErrorObservable, String>
     @FXML lateinit var columnErrorTableColumn: TableColumn<ErrorObservable, String>
+    @FXML lateinit var treeView:TreeView<String>
 
     @FXML
     fun analyze(event : ActionEvent){
@@ -45,8 +49,21 @@ class InitViewController {
             lexical.analyze()
             fillTokensTableView(lexical)
             fillErrorsTableView(lexical)
+
+            if(lexical.errorList.isEmpty()) {
+                val syntactic = SyntacticAnalyzer(lexical.tokenList)
+                val compilationUnit = syntactic.isCompilationUnit()
+
+                if (compilationUnit != null) {
+                    treeView.root = compilationUnit.getTreeView()
+                }
+            }else{
+                RootViewController.showAlert("Existen errores léxicos","ADVERTENCIA",Alert.AlertType.WARNING)
+            }
+
         }
     }
+
 
     /**
      * fill Tokens Table View method
@@ -98,5 +115,9 @@ class InitViewController {
         categoryErrorTableColumn.cellValueFactory = PropertyValueFactory<ErrorObservable, String>("errorCategory")
         rowErrorTableColumn.cellValueFactory = PropertyValueFactory<ErrorObservable, String>("row")
         columnErrorTableColumn.cellValueFactory = PropertyValueFactory<ErrorObservable, String>("column")
+    }
+
+    override fun initialize(location: URL?, resources: ResourceBundle?) {
+        initizalize()
     }
 }

@@ -1,4 +1,4 @@
 package co.edu.uniquindio.compilers.syntacticAnalyzer
 
-class Expression {
+open class Expression {
 }
