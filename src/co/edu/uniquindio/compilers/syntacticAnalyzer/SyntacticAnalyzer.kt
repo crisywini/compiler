@@ -151,19 +151,19 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
                                     setNextToken()
                                     return VariableInitialization(dataType, identifier,  value)
                                 }else{
-                                    reportError("Falta la terminal")
+                                    reportError("Falta la terminal en la variable inmutable")
                                 }
                             }else{
-                                reportError("Falta el valor de la variable")
+                                reportError("Falta el valor de la variable en la variable inmutable")
                             }
                         }else{
                             doBacktracking(initialPosition2)
                         }
                     }else{
-                        reportError("Falta el identificador")
+                        reportError("Falta el identificador en la variable inmutable")
                     }
                 }else{
-                    reportError("Falta el ;")
+                    reportError("Falta el ; en la variable inmutable")
                 }
             }else{
                 doBacktracking(initialPosition1)
@@ -177,7 +177,8 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
      */
     fun isValue():Token?{
         if(currentToken.category == Category.CADENA_CARACTERES || currentToken.category == Category.DECIMAL || currentToken.category == Category.ENTERO
-                || (currentToken.category == Category.PALABRA_RESERVADA &&(currentToken.lexema == "kronos" || currentToken.lexema ==  "zeus"))){
+                || (currentToken.category == Category.PALABRA_RESERVADA &&(currentToken.lexema == "kronos" || currentToken.lexema ==  "zeus"))
+                ||currentToken.category == Category.CARACTER){
             return currentToken
         }
         return  null
@@ -274,34 +275,38 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
         if(currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "tutti" ){
             setNextToken()
             if(currentToken.category == Category.IDENTIFICADOR ){
-                var identifier = currentToken
+                val identifier = currentToken
                 setNextToken()
                 if(currentToken.category == Category.PARENTESIS_IZQUIERDO){
                     setNextToken()
-                    var paramList = isParamList()
+                    val paramList = isParamList()
                     if(currentToken.category == Category.PARENTESIS_DERECHO){
                         setNextToken()
-                        var statementBlock = isStatementBlock()
+                        print(currentToken.lexema)
+                        print("FUNCIÓN TOKEN \n")
+                        val statementBlock = isStatementBlock()
+                        print(statementBlock)
+                        print(" FUNCIÓN \n")
                         if(statementBlock != null){
-                            var returnType = isReturnType()
+                            val returnType = isReturnType()
                             if(returnType!=null){
                                 setNextToken()
                                 //This function is correct
                                 return Function(identifier,returnType, paramList, statementBlock)
                             }else{
-                                reportError("El tipo de retorno está vacio")
+                                reportError("El tipo de retorno está vacio en la función")
                             }
                         }else{
-                            reportError("Falta el bloque de sentencias ")
+                            reportError("Falta el bloque de sentencias en la función")
                         }
                     }else{
-                        reportError("Falta el paréntesis derecho")
+                        reportError("Falta el paréntesis derecho en la función")
                     }
                 }else{
-                    reportError("Falta el paréntesis izquierdo")
+                    reportError("Falta el paréntesis izquierdo en la función")
                 }
             }else{
-                reportError("Falta el identificador")
+                reportError("Falta el identificador en la función")
             }
         }
         return null
@@ -332,16 +337,16 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
                                 return Decision(expression, statementBlock,null)
                             }
                         }else{
-                            reportError("Falta bloque de sentencias")
+                            reportError("Falta bloque de sentencias en el eva")
                         }
                     }else{
-                        reportError("Falta parentesis derecho")
+                        reportError("Falta parentesis derecho en el eva")
                     }
                 }else{
-                    reportError("Falta la expresion logica")
+                    reportError("Falta la expresion logica en el eva")
                 }
             }else{
-                reportError("Falta parentesis izquierdo")
+                reportError("Falta parentesis izquierdo en el eva")
             }
         }
         return null;
@@ -354,18 +359,19 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
     fun isCycle():Cycle? {
         if (currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "rondo") {
             setNextToken()
-                var expression = isLogicalExpression()
-                if (expression != null) {
-                        setNextToken()
-                        var statementBlock = isStatementBlock()
-                        if(statementBlock != null) {
-                            return Cycle(expression, statementBlock)
-                        }else{
-                            reportError("Falta bloque de sentencias")
-                        }
+
+            val expression = isLogicalExpression()
+            if (expression != null) {
+                val statementBlock = isStatementBlock()
+
+                if(statementBlock != null) {
+                    return Cycle(expression, statementBlock)
                 }else{
-                    reportError("Falta la expresion del ciclo")
+                    reportError("Falta bloque de sentencias en el ciclo")
                 }
+            }else{
+                reportError("Falta la expresion del ciclo")
+            }
         }
         return null
     }
@@ -429,8 +435,6 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
             }else{
                 reportError("Falta el parentesis izquierdo")
             }
-        }else{
-            reportError("Falta el identificador")
         }
         return null
     }
@@ -454,8 +458,6 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
             }else{
                 reportError("Falta el operador de incremento")
             }
-        }else{
-            reportError("Falta el identificador")
         }
         return null
     }
@@ -479,8 +481,6 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
             }else{
                 reportError("Falta el operador de decremento")
             }
-        }else{
-            reportError("Falta el identificador")
         }
         return null
     }
@@ -612,12 +612,8 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
     fun isArgument():Argument?{
         val name = currentToken
         val expression = isExpression()
-
         if (name.category == Category.IDENTIFICADOR || expression != null) {
-
             return Argument(name, expression)
-        } else {
-            reportError("Falta un identificador o una expresion")
         }
         return null
     }
@@ -646,9 +642,11 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
      * <StatementBlock> ::= "<"[<StatementList>]">"
      */
     fun isStatementBlock():ArrayList<Statement>?{//Debe retornar un bloque de sentencias
+
         if(currentToken.category == Category.LLAVE_IZQUIERDA){
             setNextToken()
-            var statementList = isStatementList()
+            val statementList = isStatementList()
+
             if(currentToken.category == Category.LLAVE_DERECHA){
                 setNextToken()
                 return statementList
@@ -675,49 +673,66 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
      *                  | <Return> | <Read> | <FunctionInvocation> | <Increment> | <Decrement>
      */
     fun isStatement():Statement?{
-        var statement:Statement? = isVariableDeclaration()
 
-        statement = isFunctionInvocation()
+        var statement:Statement? = isVariableDeclaration()
+        println("SENTENCIA DECLARACIÓN DE VARIABLE? ${statement != null}")
         if(statement != null){
             return statement
         }
+        statement = isFunctionInvocation()
+        println("SENTENCIA INVOCACIÓN DE FUNCIÓN? ${statement != null}")
+
         if(statement != null){
             return statement
         }
         statement = isDecision()
+        println("SENTENCIA DECISIÓN? ${statement != null}")
+
         if(statement != null){
             return statement
         }
         statement = isAssignment()
+        println("SENTENCIA ASIGNACIÓN? ${statement != null}")
+
         if(statement != null){
             return statement
         }
         statement = isCycle()
+        println("SENTENCIA CICLO? ${statement != null}")
+
         if(statement != null){
             return statement
         }
         statement = isRead()
+        println("SENTENCIA LECTURA? ${statement != null}")
+
         if(statement != null){
             return statement
         }
         statement = isIncrement()
+        println("SENTENCIA INCREMENTO? ${statement != null}")
+
         if(statement != null){
             return statement
         }
         statement = isDecrement()
+        println("SENTENCIA DECREMENTO? ${statement != null}")
+
         if(statement != null){
             return statement
         }
         statement = isReturn()
+        println("SENTENCIA RETORNO? ${statement != null}")
+
         if(statement != null){
             return statement
         }
         statement = isPrint()
+        println("SENTENCIA IMPRESIÓN? ${statement != null}")
+
         if(statement != null){
             return statement
         }
-
-
         return null
     }
 
@@ -745,8 +760,6 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
             }else{
                 reportError("Falta el operador de asignación")
             }
-        }else{
-            reportError("Falta el identificador")
         }
         return null
     }
@@ -756,7 +769,6 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
      *                      <LogicExpression> | <StringExpression>
      */
     fun isExpression():Expression?{
-
         var expression:Expression? = isArithmeticExpression()
         if(expression != null){
             return  expression
@@ -902,7 +914,6 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
         }else{
             val relationalExpression1 = isRelationalExpression()
             if(relationalExpression1!=null){
-                setNextToken()
                 if(currentToken.category == Category.OPERADOR_LOGICO){
                     val operator = currentToken
                     setNextToken()
@@ -935,30 +946,30 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
      */
     fun isRelationalExpression():RelationalExpression?{
         if(currentToken.category == Category.PALABRA_RESERVADA && (currentToken.lexema == "kronos"|| currentToken.lexema == "zeus" || currentToken.lexema == "yas")){
-            setNextToken()
             return RelationalExpression(currentToken)
         }else{
-            var initialPosition = currentPosition
-            val expression = isExpression()
-            if(expression != null){
-                return RelationalExpression(expression)
+            val initialPosition = currentPosition
+            val arithmeticExpression = isArithmeticExpression()
+            if(arithmeticExpression != null){
+                if(currentToken.category == Category.OPERADORES_RELACIONALES){
+                    val operator = currentToken
+                    setNextToken()
+                    val arithmeticExpression2 = isArithmeticExpression()
+                    if(arithmeticExpression2 !=null){
+                        return RelationalExpression(arithmeticExpression, operator, arithmeticExpression2)
+                    }else{
+                        reportError("Falta la expresión aritmética 2 en la expresión relacional")
+                    }
+                }else{
+                    reportError("Falta el operador relacional en la expresión relacional")
+                }
             }else{
                 doBacktracking(initialPosition)
-                val arithmeticExpression = isArithmeticExpression()
-                if(arithmeticExpression != null){
-                    setNextToken()
-                    if(currentToken.category == Category.OPERADORES_RELACIONALES){
-                        val operator = currentToken
-                        setNextToken()
-                        val arithmeticExpression2 = isArithmeticExpression()
-                        if(arithmeticExpression2 !=null){
-                            return RelationalExpression(arithmeticExpression, operator, arithmeticExpression2)
-                        }else{
-                            reportError("Falta la expresión aritmética 2 en la expresión relacional")
-                        }
-                    }else{
-                        reportError("Falta el operador relacional en la expresión relacional")
-                    }
+                val expression = isExpression()
+                if(expression != null){
+                    return RelationalExpression(expression)
+                }else{
+                    reportError("Falta la expesión en la expresión relacional")
                 }
             }
         }
@@ -972,7 +983,7 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
         if(currentToken.category == Category.PALABRA_RESERVADA){
             if(currentToken.lexema == "becu" || currentToken.lexema=="pulso"
                     ||currentToken.lexema == "largo" || currentToken.lexema == "ante"
-                    || currentToken.lexema == "bridge"){
+                    || currentToken.lexema == "bridge" || currentToken.lexema == "bemol"){
                 return currentToken
             }
         }

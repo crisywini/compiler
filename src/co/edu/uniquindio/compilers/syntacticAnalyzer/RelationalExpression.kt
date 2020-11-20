@@ -30,4 +30,8 @@ class RelationalExpression():Expression() {
         this.expression = expression
     }
 
+    override fun toString(): String {
+        return "RelationalExpression(arithmeticExpression1=$arithmeticExpression1, arithmeticExpression2=$arithmeticExpression2, operator1=$operator1, operator2=$operator2, token=$token, relationalExpression=$relationalExpression, expression=$expression)"
+    }
+
 }
