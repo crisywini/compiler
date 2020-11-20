@@ -48,7 +48,6 @@ class InitViewController:Initializable {
             val lexical = LexicalAnalyzer(sourceCodeTextArea.text)
             lexical.analyze()
             fillTokensTableView(lexical)
-            fillErrorsTableView(lexical)
 
             if(lexical.errorList.isEmpty()) {
                 val syntactic = SyntacticAnalyzer(lexical.tokenList)
@@ -59,6 +58,7 @@ class InitViewController:Initializable {
                 }
                 fillErrorsTableView(lexical, syntactic)
             }else{
+                fillErrorsTableView(lexical)
                 RootViewController.showAlert("Existen errores léxicos","ADVERTENCIA",Alert.AlertType.WARNING)
             }
 
@@ -97,6 +97,10 @@ class InitViewController:Initializable {
     private fun fillErrorsTableView(lexical:LexicalAnalyzer, syntacticAnalyzer: SyntacticAnalyzer){
         errorsTableView.items.clear()
         for(element in lexical.errorList){
+            errorsTableView.items.add(ErrorObservable(element.error, "".plus(element.row), "".plus(element.column)
+                    , element.errorCategory.toString()))
+        }
+        for(element in syntacticAnalyzer.errorList){
             errorsTableView.items.add(ErrorObservable(element.error, "".plus(element.row), "".plus(element.column)
                     , element.errorCategory.toString()))
         }

@@ -334,7 +334,9 @@ class LexicalAnalyzer(var sourceCode: String) {
                 || currentCharacter == 'p' || currentCharacter == 'a'
                 || currentCharacter == 'G' || currentCharacter == 'c'
                 || currentCharacter == 'r' || currentCharacter == 'e'
-                || currentCharacter == 'd' || currentCharacter == 'b') {
+                || currentCharacter == 'd' || currentCharacter == 'b'
+                || currentCharacter == 'k' || currentCharacter == 'z'
+                || currentCharacter == 'y') {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
@@ -788,7 +790,54 @@ class LexicalAnalyzer(var sourceCode: String) {
                     doBackTracking(initialPosition, initialRow, initialColumn)
                     return false
                 }
-            } else {
+            } else if(currentCharacterCopy=='z' &&currentCharacter=='e'){
+                lexema += currentCharacter
+                setNextCharacter()
+                if(currentCharacter == 'u'){
+                    lexema += currentCharacter
+                    setNextCharacter()
+                    if(currentCharacter == 's'){
+                        lexema += currentCharacter
+                        setNextCharacter()
+                    }else{
+                        doBackTracking(initialPosition, initialRow, initialColumn)
+                        return false
+                    }
+                }else{
+                    doBackTracking(initialPosition, initialRow, initialColumn)
+                    return false
+                }
+            }else if(currentCharacterCopy == 'k' && currentCharacter == 'r'){
+                lexema += currentCharacter
+                setNextCharacter()
+                if(currentCharacter == 'o'){
+                    lexema += currentCharacter
+                    setNextCharacter()
+                    if(currentCharacter == 'n'){
+                        lexema += currentCharacter
+                        setNextCharacter()
+                        if(currentCharacter == 'o'){
+                            lexema += currentCharacter
+                            setNextCharacter()
+                            if(currentCharacter == 's'){
+                                lexema += currentCharacter
+                                setNextCharacter()
+                            }else{
+                                doBackTracking(initialPosition, initialRow, initialColumn)
+                                return false                            }
+                        }else{
+                            doBackTracking(initialPosition, initialRow, initialColumn)
+                            return false
+                        }
+                    }else{
+                        doBackTracking(initialPosition, initialRow, initialColumn)
+                        return false
+                    }
+                }else{
+                    doBackTracking(initialPosition, initialRow, initialColumn)
+                    return false
+                }
+            }else{
                 doBackTracking(initialPosition, initialRow, initialColumn)
                 return false
             }
@@ -803,7 +852,7 @@ class LexicalAnalyzer(var sourceCode: String) {
      * This method allows to verify the logical operators
      */
     fun isLogicalOperator(): Boolean {
-        if (currentCharacter == 'a' || currentCharacter == 'o') {
+        if (currentCharacter == 'a' || currentCharacter == 'o' || currentCharacter == 'y') {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
@@ -824,7 +873,17 @@ class LexicalAnalyzer(var sourceCode: String) {
             } else if (currentCharacterCopy == 'o' && currentCharacter == 'r') {
                 lexema += currentCharacter
                 setNextCharacter()
-            } else {
+            } else if(currentCharacterCopy == 'y' && currentCharacter == 'a'){
+                lexema += currentCharacter
+                setNextCharacter()
+                if(currentCharacter == 's') {
+                    lexema += currentCharacter
+                    setNextCharacter()
+                }else{
+                    doBackTracking(initialPosition, initialRow, initialColumn)
+                    return false
+                }
+            }else{
                 doBackTracking(initialPosition, initialRow, initialColumn)
                 return false
             }
@@ -985,7 +1044,7 @@ class LexicalAnalyzer(var sourceCode: String) {
      */
     fun isComment(): Boolean {
 
-        if (currentCharacter == '[') {
+        if (currentCharacter == '/') {
 
             var lexema = ""
             var initialRow = currentRow
@@ -994,7 +1053,7 @@ class LexicalAnalyzer(var sourceCode: String) {
             lexema += currentCharacter
             setNextCharacter()//Cambiar nombre a actualizar caracter
 
-            if(currentCharacter == '['){
+            if(currentCharacter == '/'){
                 while (currentCharacter != '\n' && currentCharacter != endCode) {
                     lexema += currentCharacter
                     setNextCharacter()//Cambiar nombre a actualizar caracter
@@ -1160,7 +1219,7 @@ class LexicalAnalyzer(var sourceCode: String) {
             lexema += currentCharacter
             setNextCharacter()
 
-            if(currentCharacter==':'){
+            if(currentCharacter==':' || currentCharacter=='-'){
                 doBackTracking(actual, initialRow, initialColumn)
                 return false
             }

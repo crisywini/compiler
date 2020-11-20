@@ -8,8 +8,9 @@ class RelationalExpression():Expression() {
     var arithmeticExpression2:ArithmeticExpression? = null
     var operator1:Token? = null
     var operator2:Token? = null
+    var token:Token? = null
     var relationalExpression:RelationalExpression? = null
-
+    var expression:Expression? = null
     constructor(arithmeticExpression1:ArithmeticExpression?, operator1:Token?, arithmeticExpression2:ArithmeticExpression?, operator2:Token?, relationalExpression:RelationalExpression?):this(){
         this.arithmeticExpression1 = arithmeticExpression1
         this.operator1 = operator1
@@ -21,6 +22,12 @@ class RelationalExpression():Expression() {
         this.arithmeticExpression1 = arithmeticExpression1
         this.operator1 = operator1
         this.arithmeticExpression2 = arithmeticExpression2
+    }
+    constructor(token:Token?):this(){
+        this.token = token
+    }
+    constructor(expression: Expression?):this(){
+        this.expression = expression
     }
 
 }
