@@ -573,10 +573,11 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
     fun isParam():Param?{
 
         val dataType = isDataType()
-        val name = currentToken
+
         if(dataType != null) {
             setNextToken()
             if (currentToken.category == Category.IDENTIFICADOR) {
+                val name = currentToken
                 setNextToken()
 
                 return Param(name, dataType)
@@ -586,7 +587,6 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
         }
         return null
     }
-
 
     /**
     * <ParamList> ::= <Param>|["_"<ParamList>]
@@ -599,10 +599,8 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
             paramList.add(param)
             if(currentToken.category==Category.SEPARADOR){
                 setNextToken()
-                param = isParam()
-            } else {
+            } else if(currentToken.category != Category.PARENTESIS_DERECHO){
                 reportError("Falta un separador en la lista de parámetros")
-                break
             }
             param = isParam()
         }
@@ -612,13 +610,36 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
      * <argument> ::= identificador | <Expression>
      */
     fun isArgument():Argument?{
+        val name = currentToken
+        val expression = isExpression()
+
+        if (name.category == Category.IDENTIFICADOR || expression != null) {
+
+            return Argument(name, expression)
+        } else {
+            reportError("Falta un identificador o una expresion")
+        }
         return null
     }
     /**
      * <argumentList> ::= <argument>|["_"<argumentList>]
      */
     fun isArgumentList(): ArrayList<Argument>? {
-        return null
+        var argumentList = ArrayList<Argument>()
+        var argument = isArgument()
+
+        while(argument!=null){
+            argumentList.add(argument)
+            if(currentToken.category==Category.SEPARADOR){
+                setNextToken()
+            } else if(currentToken.category != Category.PARENTESIS_DERECHO){
+                reportError("Falta un separador en la lista de argumentos")
+            } else {
+                break
+            }
+            argument = isArgument()
+        }
+        return argumentList
     }
 
     /**
@@ -656,6 +677,10 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
     fun isStatement():Statement?{
         var statement:Statement? = isVariableDeclaration()
 
+        statement = isFunctionInvocation()
+        if(statement != null){
+            return statement
+        }
         if(statement != null){
             return statement
         }
@@ -672,10 +697,6 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
             return statement
         }
         statement = isRead()
-        if(statement != null){
-            return statement
-        }
-        statement = isFunctionInvocation()
         if(statement != null){
             return statement
         }
@@ -969,6 +990,45 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
                 return currentToken
             }
         }
+        return null
+    }
+    /**
+     * <DeclaracionArreglo> ::= <TipoDato> identificador “{““}” [<InicializacionArreglo>]  “\”
+     * <TipoDato> ::= becu | bemol | ante | bridge | pulso | largo
+     */
+    fun isDeclarationArray():Token?{
+
+        return null
+    }
+
+    /**
+     * <InicializacionArreglo> ::= “;” <TipoDato> “{“ identificador “}”  |  “;” <TipoDato> “{“ <Numero> “}”
+     * <TipoDato> ::= becu | bemol | ante | bridge | pulso | largo
+     *<Número> ::= Entero
+     */
+    fun isInitializationArray():Token?{
+
+        return null
+    }
+
+    /**
+     * <Casting> ::=  <TipoDato> identificador “;” “[“ <TipoDato> “]” identificador “\”  |
+     * <TipoDato> identificador “;” “[“ <TipoDato> “]” <ExpresionAritmetica> “\”
+     */
+    fun isCasting():Token?{
+
+
+        return null
+    }
+
+    /**
+     * <Switch> ::=  option “[“ identificador “]” “<” <ListaCasos> “>”
+     * <ListaCasos> ::= <Casos> ["_"<ListaCasos>]
+     * <Casos> ::=  rast Entero “;”  <Sentencia>  “\”  “,” GP “\” |  rast cadena_caracteres “;”
+     * <Sentencia>  “\”  “,” GP “\”  | rast caracter “;” <Sentencia>  “\”  “,” GP “\”
+     */
+    fun isSwitch():Token?{
+
         return null
     }
 }
