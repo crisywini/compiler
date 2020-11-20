@@ -348,17 +348,14 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
     }
 
     /**
-     * <CycleWhile>::= Rondo “[” <logicalExpression> “]” <StatementBlock>
+     * <CycleWhile>::= Rondo <logicalExpression> <StatementBlock>
      *
      */
     fun isCycle():Cycle? {
         if (currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "rondo") {
             setNextToken()
-            if (currentToken.category == Category.PARENTESIS_IZQUIERDO) {
-                setNextToken()
                 var expression = isLogicalExpression()
                 if (expression != null) {
-                    if (currentToken.category == Category.PARENTESIS_DERECHO) {
                         setNextToken()
                         var statementBlock = isStatementBlock()
                         if(statementBlock != null) {
@@ -366,15 +363,9 @@ class SyntacticAnalyzer(var tokenList:ArrayList<Token>) {
                         }else{
                             reportError("Falta bloque de sentencias")
                         }
-                    }else{
-                        reportError("Falta parentesis derecho")
-                    }
                 }else{
                     reportError("Falta la expresion del ciclo")
                 }
-            }else{
-                reportError("Falta parentesis izquierdo")
-            }
         }
         return null
     }
