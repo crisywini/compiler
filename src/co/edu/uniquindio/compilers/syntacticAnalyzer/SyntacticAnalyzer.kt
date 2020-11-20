@@ -651,6 +651,8 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
     fun isStatementBlock():ArrayList<Statement>?{//Debe retornar un bloque de sentencias
 
         if(currentToken.category == Category.LLAVE_IZQUIERDA){
+            println(currentToken.lexema)
+
             setNextToken()
             val statementList = isStatementList()
 
@@ -736,6 +738,12 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
         }
         statement = isPrint()
         println("SENTENCIA IMPRESIÓN? ${statement != null}")
+
+        if(statement != null){
+            return statement
+        }
+        statement = isSwitch()
+        println("SENTENCIA SWITCH? ${statement != null}")
 
         if(statement != null){
             return statement
