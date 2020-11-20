@@ -9,7 +9,7 @@ class Switch (var name:Token, var caseList:ArrayList<Case>):Statement(){
         return "Argument(name=$name, caseList=$caseList)"
     }
     override fun getTreeView(): TreeItem<String> {
-        var treeName = TreeItem("${name.lexema}")
+        var treeName = TreeItem("Identificador: ${name.lexema}")
         var treeCase = TreeItem("Casos")
 
         for (case in caseList){

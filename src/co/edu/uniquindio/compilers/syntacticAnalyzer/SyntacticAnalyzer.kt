@@ -683,7 +683,13 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
      */
     fun isStatement():Statement?{
 
-        var statement:Statement? = isVariableDeclaration()
+        var statement:Statement? = isDeclarationArray()
+        println("SENTENCIA DECLARACION ARREGLO? ${statement != null}")
+
+        if(statement != null){
+            return statement
+        }
+        statement = isVariableDeclaration()
         println("SENTENCIA DECLARACIÓN DE VARIABLE? ${statement != null}")
         if(statement != null){
             return statement
@@ -748,6 +754,8 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
         if(statement != null){
             return statement
         }
+
+
         return null
     }
 
@@ -1023,8 +1031,37 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
      * <DeclaracionArreglo> ::= <TipoDato> identificador “{““}” [<InicializacionArreglo>]  “\”
      * <TipoDato> ::= becu | bemol | ante | bridge | pulso | largo
      */
-    fun isDeclarationArray(): Token? {
+    fun isDeclarationArray(): DeclarationArray ?{
 
+        var dataType = isDataType()
+
+        if(dataType != null){
+            setNextToken()
+            if(currentToken.category == Category.IDENTIFICADOR){
+                    var name = currentToken
+                    setNextToken()
+                if(currentToken.category == Category.CORCHETE_IZQUIERDO){
+                    setNextToken()
+                    if(currentToken.category == Category.CORCHETE_DERECHO){
+
+                        setNextToken()
+                        var initialization = isInitializationArray()
+                        if(currentToken.category == Category.TERMINAL){
+                            setNextToken()
+                            return DeclarationArray(dataType, name, initialization)
+                        } else {
+                            reportError("Falta el terminal")
+                        }
+                    } else {
+                        reportError("Falta el corchete derecho }")
+                    }
+                } else {
+                    reportError("Falta el corchete izquierdo {")
+                }
+            } else {
+                reportError("Falta el identificador")
+            }
+        }
         return null
     }
 
@@ -1033,8 +1070,27 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
      * <TipoDato> ::= becu | bemol | ante | bridge | pulso | largo
      *<Número> ::= Entero
      */
-    fun isInitializationArray(): Token? {
+    fun isInitializationArray(): InitializationArray? {
 
+        if(currentToken.category == Category.DOS_PUNTOS){
+            setNextToken()
+            var dataType = isDataType()
+            if (dataType != null){
+                setNextToken()
+                if (currentToken.category == Category.CORCHETE_IZQUIERDO){
+                    setNextToken()
+                    if (currentToken.category == Category.IDENTIFICADOR ||
+                            currentToken.category == Category.ENTERO){
+                        var name = currentToken
+                        setNextToken()
+                        if (currentToken.category == Category.CORCHETE_DERECHO) {
+                            setNextToken()
+                            return InitializationArray(name, dataType)
+                        }
+                    }
+                }
+            }
+        }
         return null
     }
 
