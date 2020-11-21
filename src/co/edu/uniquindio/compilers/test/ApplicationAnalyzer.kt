@@ -1,9 +1,20 @@
 package co.edu.uniquindio.compilers.test
 
 import co.edu.uniquindio.compilers.lexicalAnalyzer.LexicalAnalyzer
+import co.edu.uniquindio.compilers.syntacticAnalyzer.SyntacticAnalyzer
 
 fun main(){
-    val lexico = LexicalAnalyzer("           4654.64    asd asd321 654\nasdasdasd789654")
+    // <VariableDeclaration> ::= <DataType> tutti ";" <IdentifiersList> " \ "
+    // [~h] <: [~j] <- [~n] >: [$12,5] or [~a]
+    val sourceCode = "(string) * (string) * (string)"
+    val lexico = LexicalAnalyzer(sourceCode)
     lexico.analyze()
-    print(lexico.tokenList)
+    //print(lexico.tokenList)
+    println("LISTA DE TOKENS LEXICO\n${lexico.tokenList}")
+    val sintactico = SyntacticAnalyzer(lexico.tokenList)
+    println(sintactico.isStringExpression())
+  // println("ES EXPRESION :\n${sintactico.isLogicalExpression()}")
+   //println(sintactico.isFunction())
+   //println(sintactico.isCycle())
+   println("LISTA DE ERORES\n${sintactico.errorList}")
 }

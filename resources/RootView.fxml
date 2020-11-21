@@ -4,5 +4,7 @@
 
 
 <BorderPane fx:id="rootPane" prefHeight="750.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.uniquindio.compilers.controller.RootViewController">
-
+    <center>
+        <fx:include fx:id="initView" source="InitView.fxml"/>
+    </center>
 </BorderPane>

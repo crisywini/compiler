@@ -66,6 +66,8 @@ class LexicalAnalyzer(var sourceCode: String) {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
+            var actual = actualPosition
+            var isError = false
 
             lexema += currentCharacter
             setNextCharacter()
@@ -78,6 +80,15 @@ class LexicalAnalyzer(var sourceCode: String) {
                     if (currentCharacter.isDigit()) {
                         lexema += currentCharacter
                         setNextCharacter()
+                    }
+                    else{
+                        isError = true
+                    }
+                    if (isError) {
+                        lexema += currentCharacter
+                        setNextCharacter()
+                        storeError(lexema, initialRow, initialColumn, ErrorCategory.ERROR_LEXICO)
+                        return true
                     }
                 } else {
                     lexema += currentCharacter
@@ -100,6 +111,9 @@ class LexicalAnalyzer(var sourceCode: String) {
 
                 storeToken(lexema, Category.DECIMAL, initialRow, initialColumn)
                 return true
+            }
+            else {
+                doBackTracking(actual, initialRow, initialColumn)
             }
         }
         return false
@@ -129,6 +143,9 @@ class LexicalAnalyzer(var sourceCode: String) {
             var isError = false
             lexema += currentCharacter
             setNextCharacter()//Cambiar nombre a actualizar caracter
+            if(currentCharacter == '('){
+                isError = true
+            }
             while (currentCharacter != ')' && currentCharacter != endCode) {
                 lexema += currentCharacter
                 setNextCharacter()//Cambiar nombre a actualizar caracter
@@ -138,6 +155,10 @@ class LexicalAnalyzer(var sourceCode: String) {
                     if (currentCharacter != 'n' && currentCharacter != 't' && currentCharacter != 'b'
                             && currentCharacter != 'r' && currentCharacter != '(' && currentCharacter != ')'
                             && currentCharacter != '?' && currentCharacter != '¿') {
+                        isError = true
+                    }
+                }else {
+                    if (currentCharacter == '(') {
                         isError = true
                     }
                 }
@@ -313,7 +334,9 @@ class LexicalAnalyzer(var sourceCode: String) {
                 || currentCharacter == 'p' || currentCharacter == 'a'
                 || currentCharacter == 'G' || currentCharacter == 'c'
                 || currentCharacter == 'r' || currentCharacter == 'e'
-                || currentCharacter == 'd' || currentCharacter == 'b') {
+                || currentCharacter == 'd' || currentCharacter == 'b'
+                || currentCharacter == 'k' || currentCharacter == 'z'
+                || currentCharacter == 'y') {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
@@ -767,7 +790,54 @@ class LexicalAnalyzer(var sourceCode: String) {
                     doBackTracking(initialPosition, initialRow, initialColumn)
                     return false
                 }
-            } else {
+            } else if(currentCharacterCopy=='z' &&currentCharacter=='e'){
+                lexema += currentCharacter
+                setNextCharacter()
+                if(currentCharacter == 'u'){
+                    lexema += currentCharacter
+                    setNextCharacter()
+                    if(currentCharacter == 's'){
+                        lexema += currentCharacter
+                        setNextCharacter()
+                    }else{
+                        doBackTracking(initialPosition, initialRow, initialColumn)
+                        return false
+                    }
+                }else{
+                    doBackTracking(initialPosition, initialRow, initialColumn)
+                    return false
+                }
+            }else if(currentCharacterCopy == 'k' && currentCharacter == 'r'){
+                lexema += currentCharacter
+                setNextCharacter()
+                if(currentCharacter == 'o'){
+                    lexema += currentCharacter
+                    setNextCharacter()
+                    if(currentCharacter == 'n'){
+                        lexema += currentCharacter
+                        setNextCharacter()
+                        if(currentCharacter == 'o'){
+                            lexema += currentCharacter
+                            setNextCharacter()
+                            if(currentCharacter == 's'){
+                                lexema += currentCharacter
+                                setNextCharacter()
+                            }else{
+                                doBackTracking(initialPosition, initialRow, initialColumn)
+                                return false                            }
+                        }else{
+                            doBackTracking(initialPosition, initialRow, initialColumn)
+                            return false
+                        }
+                    }else{
+                        doBackTracking(initialPosition, initialRow, initialColumn)
+                        return false
+                    }
+                }else{
+                    doBackTracking(initialPosition, initialRow, initialColumn)
+                    return false
+                }
+            }else{
                 doBackTracking(initialPosition, initialRow, initialColumn)
                 return false
             }
@@ -782,7 +852,7 @@ class LexicalAnalyzer(var sourceCode: String) {
      * This method allows to verify the logical operators
      */
     fun isLogicalOperator(): Boolean {
-        if (currentCharacter == 'a' || currentCharacter == 'o') {
+        if (currentCharacter == 'a' || currentCharacter == 'o' || currentCharacter == 'y') {
             var lexema = ""
             var initialRow = currentRow
             var initialColumn = currentColumn
@@ -803,7 +873,17 @@ class LexicalAnalyzer(var sourceCode: String) {
             } else if (currentCharacterCopy == 'o' && currentCharacter == 'r') {
                 lexema += currentCharacter
                 setNextCharacter()
-            } else {
+            } else if(currentCharacterCopy == 'y' && currentCharacter == 'a'){
+                lexema += currentCharacter
+                setNextCharacter()
+                if(currentCharacter == 's') {
+                    lexema += currentCharacter
+                    setNextCharacter()
+                }else{
+                    doBackTracking(initialPosition, initialRow, initialColumn)
+                    return false
+                }
+            }else{
                 doBackTracking(initialPosition, initialRow, initialColumn)
                 return false
             }
@@ -841,6 +921,9 @@ class LexicalAnalyzer(var sourceCode: String) {
 
                 storeToken(lexema, Category.ENTERO, initialRow, initialColumn)
                 return true
+            }
+            else {
+                doBackTracking(initialPosition, initialRow, initialColumn)
             }
         }
         //RI -> Rechazo Inmediato
@@ -961,7 +1044,7 @@ class LexicalAnalyzer(var sourceCode: String) {
      */
     fun isComment(): Boolean {
 
-        if (currentCharacter == '[') {
+        if (currentCharacter == '/') {
 
             var lexema = ""
             var initialRow = currentRow
@@ -970,7 +1053,7 @@ class LexicalAnalyzer(var sourceCode: String) {
             lexema += currentCharacter
             setNextCharacter()//Cambiar nombre a actualizar caracter
 
-            if(currentCharacter == '['){
+            if(currentCharacter == '/'){
                 while (currentCharacter != '\n' && currentCharacter != endCode) {
                     lexema += currentCharacter
                     setNextCharacter()//Cambiar nombre a actualizar caracter
@@ -1023,52 +1106,66 @@ class LexicalAnalyzer(var sourceCode: String) {
             lexema += currentCharacter
             setNextCharacter()//Cambiar nombre a actualizar caracter
 
-            if (currentCharacter !='?' && currentCharacter !='°' ) {
-                lexema += currentCharacter
-                setNextCharacter()//Cambiar nombre a actualizar caracter
+            if(currentCharacter==endCode || currentCharacter =='?'  || currentCharacter ==' ' ) {
 
-                if(currentCharacter !='?') {
-                    isError=true
+                if (currentCharacter == endCode) {
+                    isError = true
+                }
+                if (currentCharacter == '?') {
+                    isError = true
+                }
+                if (currentCharacter == ' ') {
+                    lexema += currentCharacter
+                    setNextCharacter()
 
-                    while(currentCharacter !='?'){
-                        lexema += currentCharacter
-                        setNextCharacter()//Cambiar nombre a actualizar caracter
+                    if (currentCharacter == '?') {
+                        isError = true
                     }
                 }
             }
             else {
-
-                if (currentCharacter == '°') {
+                if (currentCharacter != '?' && currentCharacter != '°') {
                     lexema += currentCharacter
                     setNextCharacter()//Cambiar nombre a actualizar caracter
-                    if (currentCharacter == 'n' || currentCharacter == 't' || currentCharacter == 'b'
-                            || currentCharacter == 'r' || currentCharacter == '(' || currentCharacter == ')'
-                            || currentCharacter == '?' || currentCharacter == '¿') {
 
-                        lexema += currentCharacter
-                        setNextCharacter()//Cambiar nombre a actualizar caracter
-                        if(currentCharacter != '?')
-                        {
-                            isError=true
+                    if (currentCharacter != '?') {
+                        isError = true
 
-                            while(currentCharacter !='?'){
-                                lexema += currentCharacter
-                                setNextCharacter()//Cambiar nombre a actualizar caracter
-                            }
-                        }
-
-                    }
-                    else {
-                        isError=true
-                        while(currentCharacter !='?'){
+                        while (currentCharacter != '?') {
                             lexema += currentCharacter
                             setNextCharacter()//Cambiar nombre a actualizar caracter
                         }
                     }
+                } else {
+
+                    if (currentCharacter == '°') {
+                        lexema += currentCharacter
+                        setNextCharacter()//Cambiar nombre a actualizar caracter
+                        if (currentCharacter == 'n' || currentCharacter == 't' || currentCharacter == 'b'
+                                || currentCharacter == 'r' || currentCharacter == '(' || currentCharacter == ')'
+                                || currentCharacter == '?' || currentCharacter == '¿') {
+
+                            lexema += currentCharacter
+                            setNextCharacter()//Cambiar nombre a actualizar caracter
+                            if (currentCharacter != '?') {
+                                isError = true
+
+                                while (currentCharacter != '?') {
+                                    lexema += currentCharacter
+                                    setNextCharacter()//Cambiar nombre a actualizar caracter
+                                }
+                            }
+
+                        } else {
+                            isError = true
+                            while (currentCharacter != '?') {
+                                lexema += currentCharacter
+                                setNextCharacter()//Cambiar nombre a actualizar caracter
+                            }
+                        }
+                    }
                 }
             }
-
-
             if (isError) {
                 lexema += currentCharacter
                 setNextCharacter()
@@ -1122,7 +1219,7 @@ class LexicalAnalyzer(var sourceCode: String) {
             lexema += currentCharacter
             setNextCharacter()
 
-            if(currentCharacter==':'){
+            if(currentCharacter==':' || currentCharacter=='-'){
                 doBackTracking(actual, initialRow, initialColumn)
                 return false
             }
