@@ -11,7 +11,7 @@ class Case (var dataType: Token, var statement: Statement){
         var treeData = TreeItem(dataType.lexema)
         var treeStatement = statement.getTreeView()
 
-        var tree = TreeItem("case")
+        var tree = TreeItem("Casos")
         tree.children.add(treeData)
         tree.children.add(treeStatement)
 

@@ -69,18 +69,17 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
     fun isVariableDeclaration(): VariableDeclaration? {
 
         var variableDeclaration = isMutableVariableDeclaration()
-        return if (variableDeclaration != null) {
-            variableDeclaration
-        } else {
-            variableDeclaration = isImmutableVariableDeclaration()
-            variableDeclaration
+        if (variableDeclaration != null) {
+            return variableDeclaration
         }
+        return null
     }
 
     /**
      * <MutableVariableDeclaration> ::= <DataType> tutti ";" <IdentifiersList> " \ "
      */
     fun isMutableVariableDeclaration(): VariableDeclaration? {
+        val initialPosition = currentPosition
         val dataType = isDataType()
         if (dataType != null) {
             setNextToken()
@@ -103,7 +102,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                     reportError("Faltan ;")
                 }
             } else {
-                reportError("Falta la palabra reservada")
+                doBacktracking(initialPosition)
             }
         }
         return null
@@ -130,10 +129,10 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
      *
      */
     fun isImmutableVariableInitialization(): VariableInitialization? {
+        val initialPosition1 = currentPosition
         val dataType = isDataType()
         if (dataType != null) {
             setNextToken()
-            val initialPosition1 = currentPosition
             if (currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "solo") {
                 setNextToken()
                 if (currentToken.category == Category.DOS_PUNTOS) {
@@ -188,6 +187,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
      *  <ImmutableVariableDeclaration> ::= <DataType> solo ";" <IdentifiersList> " \ "
      */
     fun isImmutableVariableDeclaration(): VariableDeclaration? {
+        val initialPosition = currentPosition
         val dataType = isDataType()
         if (dataType != null) {
             setNextToken()
@@ -210,7 +210,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                     reportError("Faltan ;")
                 }
             } else {
-                reportError("Falta la palabra reservada")
+                doBacktracking(initialPosition)
             }
         }
         return null
@@ -480,34 +480,21 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
     }
 
     /**
-     * <Return>::= coda identifier “\\” | coda <expressión> “\\”
+     * <Return>::= coda identificador “\\”
      *
      */
     fun isReturn(): Return? {
+
         if (currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "coda") {
             setNextToken()
-
-            if (currentToken.category == Category.IDENTIFICADOR) {
-                var identifier = currentToken
+            if(currentToken.category == Category.IDENTIFICADOR) {
+                val identifier = currentToken
                 setNextToken()
                 if (currentToken.category == Category.TERMINAL) {
                     setNextToken()
-                    return Return(identifier, null)
+                    return Return(identifier)
                 } else {
-                    reportError("Falta el terminal")
-                }
-            } else {
-                var expression = isExpression()
-                if (expression != null) {
-                    setNextToken()
-                    if (currentToken.category == Category.TERMINAL) {
-                        setNextToken()
-                        return Return(null, expression)
-                    } else {
-                        reportError("Falta el terminal")
-                    }
-                } else {
-                    reportError("Falta un identificador o una expresion")
+                    reportError("Falta el terminal en el retorno con expresión")
                 }
             }
         }
@@ -515,7 +502,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
     }
 
     /**
-     * <Print>::= opus “[“ identifier “]” “\\” | opus “[“<Expression>“]” “\\”
+     * <Print>::= opus “[“ identifier “]” “\\” | opus “[“<StringExpression>“]” “\\”
      *
      */
     fun isPrint(): Print? {
@@ -523,9 +510,8 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
             setNextToken()
             if (currentToken.category == Category.PARENTESIS_IZQUIERDO) {
                 setNextToken()
-
                 if (currentToken.category == Category.IDENTIFICADOR) {
-                    var identifier = currentToken
+                    val identifier = currentToken
                     setNextToken()
                     if (currentToken.category == Category.PARENTESIS_DERECHO) {
                         setNextToken()
@@ -533,28 +519,28 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                             setNextToken()
                             return Print(identifier, null)
                         } else {
-                            reportError("Falta el terminal")
+                            reportError("Falta el terminal en la impresión")
                         }
                     } else {
-                        reportError("Falta parentesis derecho")
+                        reportError("Falta parentesis derecho de la impresión")
                     }
                 } else {
-                    var expression = isExpression()
+                    val expression = isStringExpression()
                     if (expression != null) {
-                        setNextToken()
                         if (currentToken.category == Category.PARENTESIS_DERECHO) {
                             setNextToken()
                             if (currentToken.category == Category.TERMINAL) {
                                 setNextToken()
+
                                 return Print(null, expression)
                             } else {
-                                reportError("Falta el terminal")
+                                reportError("Falta el terminal en la impresión")
                             }
                         } else {
-                            reportError("Falta parentesis derecho")
+                            reportError("Falta parentesis derecho en la impresión")
                         }
                     } else {
-                        reportError("Falta un identificador o una expresion")
+                        reportError("Falta la expresion de la impresión ")
                     }
                 }
             }
@@ -604,11 +590,11 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
     }
 
     /**
-     * <argument> ::= identificador | <Expression>
+     * <argument> ::= identificador | <ArithmeticExpression>
      */
     fun isArgument(): Argument? {
         val name = currentToken
-        val expression = isExpression()
+        val expression = isArithmeticExpression()
         if (name.category == Category.IDENTIFICADOR || expression != null) {
             return Argument(name, expression)
         }
@@ -673,9 +659,20 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
      *                  | <Return> | <Read> | <FunctionInvocation> | <Increment> | <Decrement>
      */
     fun isStatement(): Statement? {
-        var pos = currentPosition
 
         var statement: Statement?
+
+        statement = isImmutableVariableInitialization()
+        if(statement !=null){
+            return statement
+        }
+
+
+        statement = isVariableDeclaration()
+        println("SENTENCIA DECLARACIÓN DE VARIABLE? ${statement != null}")
+        if (statement != null) {
+            return statement
+        }
 
         statement = isCasting()
         println("SENTENCIA CASTING? ${statement != null}")
@@ -689,11 +686,6 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
             return statement
         }
 
-        statement = isVariableDeclaration()
-        println("SENTENCIA DECLARACIÓN DE VARIABLE? ${statement != null}")
-        if (statement != null) {
-            return statement
-        }
         //BIEN
         statement = isFunctionInvocation()
         println("SENTENCIA INVOCACIÓN DE FUNCIÓN? ${statement != null}")
@@ -736,7 +728,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
         if (statement != null) {
             return statement
         }
-
+        //BIEN
         statement = isReturn()
         println("SENTENCIA RETORNO? ${statement != null}")
         if (statement != null) {
@@ -748,7 +740,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
         if (statement != null) {
             return statement
         }
-
+        //BIEN
         statement = isSwitch()
         println("SENTENCIA SWITCH? ${statement != null}")
         if (statement != null) {
@@ -792,15 +784,18 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
      */
     fun isExpression(): Expression? {
         var expression: Expression? = isArithmeticExpression()
+        println("ARITMÉTICA ${expression!=null}")
         if (expression != null) {
             return expression
         }
         expression = isRelationalExpression()
+        println("RELACIONAL ${expression!=null}")
 
         if (expression != null) {
             return expression
         }
         expression = isLogicalExpression()
+        println("LÓGICA ${expression!=null}")
 
         if (expression != null) {
             return expression
@@ -815,11 +810,6 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
     }
 
     /**
-     * <ArithmeticExpression> ::= “[“ <ArithmeticExpression> “]” |
-     *                            <ArithmeticExpression> ArithmeticOperator <ArithmeticExpression> |
-     *                            <Number> |
-     *                            identifier
-     *
      * <ArithmeticExpression> ::= “[“ <ArithmeticExpression> “]”[ArithmeticOperator <ArithmeticExpression>] |
      *                          <Number>[ArithmeticOperator <ArithmeticExpression>]   |
      *                          identifier[ArithmeticOperator <ArithmeticExpression>]
@@ -829,7 +819,6 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
         if (currentToken.category == Category.PARENTESIS_IZQUIERDO) {
             setNextToken()
             val expression1 = isArithmeticExpression()
-
             if (expression1 != null) {
                 if (currentToken.category == Category.PARENTESIS_DERECHO) {
                     setNextToken()
@@ -906,7 +895,25 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
         return null
     }
 
-    fun isStringExpression(): Expression? {
+    /**
+     * <StringExpression> ::= String [ "*" <StringExpression> ]
+     */
+    fun isStringExpression(): StringExpression? {
+        if(currentToken.category == Category.CADENA_CARACTERES){
+            val string = currentToken
+            setNextToken()
+            if(currentToken.category == Category.OPERADOR_ARITMETICO && currentToken.lexema == "*"){
+                setNextToken()
+                val stringExpression = isStringExpression()
+                if(stringExpression!=null){
+                    return StringExpression(string, stringExpression)
+                }else{
+                    return StringExpression(string)
+                }
+            }else{
+                return StringExpression(string)
+            }
+        }
         return null
     }
 
@@ -1099,8 +1106,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
     }
 
     /**
-     * <Casting> ::=  <TipoDato> identificador “;” “[“ <TipoDato> “]” identificador “\”  |
-     * <TipoDato> identificador “;” “[“ <TipoDato> “]” <ExpresionAritmetica> “\”
+     * <Casting> ::= <TipoDato> identificador “;” “[“ <TipoDato> “]” <ExpresionAritmetica> “\”
      */
     fun isCasting(): Casting? {
         var dataType = isDataType()
@@ -1113,41 +1119,36 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                     setNextToken()
                     if (currentToken.category == Category.PARENTESIS_IZQUIERDO) {
                         setNextToken()
-                        var dataType1 = isDataType()
+                        val dataType1 = isDataType()
                         if (dataType1 != null) {
                             setNextToken()
                             if (currentToken.category == Category.PARENTESIS_DERECHO) {
                                 setNextToken()
-                                var expression = isExpression()
-                                if (currentToken.category == Category.IDENTIFICADOR || expression != null) {
-                                    var name:Token? = null
-                                    if(currentToken.category == Category.IDENTIFICADOR) {
-                                        name = currentToken
-                                        setNextToken()
-                                    }
+                                val expression = isExpression()
+                                if (expression != null) {
                                     if (currentToken.category == Category.TERMINAL) {
                                         setNextToken()
-                                        return Casting(name, dataType, dataType1, expression)
+                                        return Casting(dataType, dataType1, expression)
                                     } else {
-                                        reportError("Falta el terminal")
+                                        reportError("Falta el terminal en el casting")
                                     }
                                 } else {
-                                    reportError("Falta identificador o expresión")
+                                    reportError("Falta identificador o expresión en el casting")
                                 }
                             } else {
-                                reportError("Falta parentesis derecho")
+                                reportError("Falta parentesis derecho en el casting")
                             }
                         } else {
-                            reportError("falta el tipo de dato")
+                            reportError("falta el tipo de dato en el casting")
                         }
                     } else {
-                        reportError("Falta parentesis izquierdo")
+                        reportError("Falta parentesis izquierdo en el casting")
                     }
                 } else {
                     doBacktracking(pos)
                 }
             } else {
-                reportError("Falta el identificador")
+                reportError("Falta el identificador en el casting")
             }
         }
         return null

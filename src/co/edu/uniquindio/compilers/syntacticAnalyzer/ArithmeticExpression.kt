@@ -1,6 +1,7 @@
 package co.edu.uniquindio.compilers.syntacticAnalyzer
 
 import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
+import javafx.scene.control.TreeItem
 
 class ArithmeticExpression():Expression() {
 
@@ -39,4 +40,27 @@ class ArithmeticExpression():Expression() {
         this.identifier = identifier
     }
 
+    /**
+     *     var arithmeticExpression1:ArithmeticExpression? = null
+    var arithmeticExpression2:ArithmeticExpression? = null
+    var operator:Token? = null
+    var numericValue:NumericValue? = null
+    var identifier:Token? = null
+     */
+    override fun getTreeView(): TreeItem<String> {
+        val root:TreeItem<String> = TreeItem("Expresión aritmética")
+        if(arithmeticExpression1 != null){
+            root.children.add(arithmeticExpression1?.getTreeView())
+        }
+        if(arithmeticExpression2 != null){
+            root.children.add(arithmeticExpression2?.getTreeView())
+        }
+        if(operator != null){
+            root.children.add(TreeItem("Operador aritmético: ${operator?.lexema}"))
+        }
+        if(identifier != null){
+            root.children.add(TreeItem("Operador aritmético: ${identifier?.lexema}"))
+        }
+        return root
+    }
 }

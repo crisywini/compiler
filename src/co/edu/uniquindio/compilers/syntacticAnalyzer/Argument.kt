@@ -3,12 +3,30 @@ package co.edu.uniquindio.compilers.syntacticAnalyzer
 import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
 import javafx.scene.control.TreeItem
 
-class Argument(var name: Token, var expression: Expression?){
-    override fun toString(): String {
-        return "Argument(name=$name, expression=$expression)"
+class Argument(){
+
+    var arithmeticExpression:ArithmeticExpression? = null
+    var identifier:Token? = null
+    constructor(identifier:Token?, arithmeticExpression: ArithmeticExpression?):this(){
+        this.identifier = identifier
+        this.arithmeticExpression = arithmeticExpression
+    }
+    constructor(arithmeticExpression: ArithmeticExpression?):this(){
+        this.arithmeticExpression = arithmeticExpression
+    }
+
+    constructor(identifier:Token?):this(){
+        this.identifier = identifier
     }
     fun getTreeView(): TreeItem<String> {
-        return TreeItem("${name.lexema} : ${expression.toString()}")
+        val root:TreeItem<String> = TreeItem("Argumento")
+        if(identifier != null){
+            root.children.add(TreeItem("Identificador: ${identifier?.lexema}"))
+        }
+        if(arithmeticExpression !=null){
+            root.children.add(arithmeticExpression?.getTreeView())
+        }
+        return root
     }
 
 }

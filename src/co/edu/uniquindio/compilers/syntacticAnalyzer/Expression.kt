@@ -6,7 +6,7 @@ open class Expression {
     override fun toString(): String {
         return "Expression"
     }
-    fun getTreeView(): TreeItem<String> {
+    open fun getTreeView(): TreeItem<String> {
         return TreeItem("Expresion")
     }
 }
