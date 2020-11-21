@@ -6,14 +6,18 @@ import co.edu.uniquindio.compilers.syntacticAnalyzer.SyntacticAnalyzer
 fun main(){
     // <VariableDeclaration> ::= <DataType> tutti ";" <IdentifiersList> " \ "
     // [~h] <: [~j] <- [~n] >: [$12,5] or [~a]
-    val sourceCode = "[#12] <- #45"
+    val sourceCode = "tutti ~doEva[pulso ~flag]<\n" +
+            "      eva  ~flag :: ~flag <\n" +
+            "      \t  \n" +
+            "      >\n" +
+            ">pulso"
 
     val lexico = LexicalAnalyzer(sourceCode)
     lexico.analyze()
     //print(lexico.tokenList)
     println("LISTA DE TOKENS LEXICO\n${lexico.tokenList}")
     val sintactico = SyntacticAnalyzer(lexico.tokenList)
-    println(sintactico.isLogicalExpression())
+    println(sintactico.isCompilationUnit())
   // println("ES EXPRESION :\n${sintactico.isLogicalExpression()}")
    //println(sintactico.isFunction())
    //println(sintactico.isCycle())

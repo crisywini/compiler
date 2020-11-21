@@ -313,40 +313,31 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
     }
 
     /**
-     * <Decision> ::= eva “[“ <LogicalExpression> “]” <StatementBlock>  [contra  <StatementBlock>]
+     * <Decision> ::= eva  <LogicalExpression>  <StatementBlock>  [contra  <StatementBlock>]
      */
 
     fun isDecision(): Decision? {
         if (currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "eva") {
             setNextToken()
-            if (currentToken.category == Category.PARENTESIS_IZQUIERDO) {
-                setNextToken()
-                var expression = isLogicalExpression()
-                if (expression != null) {
-                    if (currentToken.category == Category.PARENTESIS_DERECHO) {
+            var expression = isLogicalExpression()
+            if (expression != null) {
+                var statementBlock = isStatementBlock()
+                if (statementBlock != null) {
+                    if (currentToken.lexema == "contra") {
                         setNextToken()
-                        var statementBlock = isStatementBlock()
-                        if (statementBlock != null) {
-                            if (currentToken.lexema == "contra") {
-                                setNextToken()
-                                var statementBlock2 = isStatementBlock()
-                                if (statementBlock2 != null) {
-                                    return Decision(expression, statementBlock, statementBlock2)
-                                }
-                            } else {
-                                return Decision(expression, statementBlock, null)
-                            }
-                        }else{
-                            reportError("Falta bloque de sentencias en el eva")
+                        var statementBlock2 = isStatementBlock()
+                        if (statementBlock2 != null) {
+                            return Decision(expression, statementBlock, statementBlock2)
                         }
-                    }else{
-                        reportError("Falta parentesis derecho en el eva")
+                    } else {
+                        return Decision(expression, statementBlock, null)
                     }
                 }else{
-                    reportError("Falta la expresion logica en el eva")
+                    reportError("Falta bloque de sentencias en el eva")
                 }
+
             }else{
-                reportError("Falta parentesis izquierdo en el eva")
+                reportError("Falta la expresion logica en el eva")
             }
         }
         return null;
@@ -395,16 +386,16 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                             setNextToken()
                             return Read(identifier)
                         } else {
-                            reportError("Falta el terminal")
+                            reportError("Falta el terminal en la lectura")
                         }
                     } else {
-                        reportError("Falta parentesis derecho")
+                        reportError("Falta parentesis derecho en la lectura")
                     }
                 } else {
-                    reportError("Falta el identificador")
+                    reportError("Falta el identificador en la lectura")
                 }
             } else {
-                reportError("Falta parentesis izquierdo")
+                reportError("Falta parentesis izquierdo en la lectura")
             }
         }
         return null
@@ -415,7 +406,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
      *
      */
     fun isFunctionInvocation(): FunctionInvocation? {
-
+        val initialPosition = currentPosition
         if (currentToken.category == Category.IDENTIFICADOR) {
             var identifier = currentToken
             setNextToken()
@@ -434,7 +425,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                     reportError("Falta el parentesis derecho")
                 }
             } else {
-                reportError("Falta el parentesis izquierdo")
+                doBacktracking(initialPosition)
             }
         }
         return null
@@ -445,7 +436,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
      *
      */
     fun isIncrement(): Increment? {
-
+        val initialPosition = currentPosition
         if (currentToken.category == Category.IDENTIFICADOR) {
             var identifier = currentToken
             setNextToken()
@@ -455,10 +446,10 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                     setNextToken()
                     return Increment(identifier)
                 } else {
-                    reportError("Falta el terminal")
+                    reportError("Falta el terminal en el incremento")
                 }
             } else {
-                reportError("Falta el operador de incremento")
+                doBacktracking(initialPosition)
             }
         }
         return null
@@ -469,7 +460,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
      *
      */
     fun isDecrement(): Decrement? {
-
+        val initialPosition = currentPosition
         if (currentToken.category == Category.IDENTIFICADOR) {
             var identifier = currentToken
             setNextToken()
@@ -479,10 +470,10 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                     setNextToken()
                     return Decrement(identifier)
                 } else {
-                    reportError("Falta el terminal")
+                    reportError("Falta el terminal en el decremento")
                 }
             } else {
-                reportError("Falta el operador de decremento")
+                doBacktracking(initialPosition)
             }
         }
         return null
@@ -688,42 +679,49 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
         if(statement != null){
             return statement
         }
+        //BIEN
         statement = isFunctionInvocation()
         println("SENTENCIA INVOCACIÓN DE FUNCIÓN? ${statement != null}")
 
         if(statement != null){
             return statement
         }
+        //BIEN
         statement = isDecision()
         println("SENTENCIA DECISIÓN? ${statement != null}")
 
         if(statement != null){
             return statement
         }
+        //BIEN
         statement = isAssignment()
         println("SENTENCIA ASIGNACIÓN? ${statement != null}")
 
         if(statement != null){
             return statement
         }
+        //BIEN
         statement = isCycle()
         println("SENTENCIA CICLO? ${statement != null}")
 
         if(statement != null){
             return statement
         }
+        //BIEN
         statement = isRead()
         println("SENTENCIA LECTURA? ${statement != null}")
 
         if(statement != null){
             return statement
         }
+        //BIEN
         statement = isIncrement()
         println("SENTENCIA INCREMENTO? ${statement != null}")
 
         if(statement != null){
             return statement
         }
+        //BIEN
         statement = isDecrement()
         println("SENTENCIA DECREMENTO? ${statement != null}")
 
@@ -755,6 +753,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
      * <Assignment>::= Identifier AssignmentOperator <Expression> “\”
      */
     fun isAssignment(): Assignment? {
+        val initialPosition = currentPosition
         if (currentToken.category == Category.IDENTIFICADOR) {
             var identifier = currentToken
             setNextToken()
@@ -762,18 +761,17 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                 setNextToken()
                 var expression = isExpression()
                 if (expression != null) {
-                    setNextToken()
                     if (currentToken.category == Category.TERMINAL) {
                         setNextToken()
                         return Assignment(identifier, expression)
                     } else {
-                        reportError("Falta el terminal")
+                        reportError("Falta el terminal en la asignación")
                     }
                 } else {
-                    reportError("Falta la expresión")
+                    reportError("Falta la expresión en la asignación")
                 }
             } else {
-                reportError("Falta el operador de asignación")
+                doBacktracking(initialPosition)
             }
         }
         return null
@@ -927,7 +925,11 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                 return LogicalExpression(operator, relationalExpression)
             }
         } else {
+            println("EXPRESIÓN LÓGICA ${currentToken.lexema}")
+
             val relationalExpression1 = isRelationalExpression()
+            println("EXPRESIÓN LÓGICA ${relationalExpression1}")
+
             if(relationalExpression1!=null){
                 if(currentToken.category == Category.OPERADOR_LOGICO){
                     val operator = currentToken
