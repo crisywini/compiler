@@ -19,6 +19,7 @@ import javafx.stage.Stage
 class App : Application(){
     /**
      * start method
+     * INICIANDO SEMANTICA
      */
     override fun start(primaryStage: Stage?) {
         val loader = FXMLLoader(App::class.java.getResource("/RootView.fxml"))
