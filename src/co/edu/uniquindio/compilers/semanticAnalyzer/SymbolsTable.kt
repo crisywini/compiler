@@ -3,9 +3,8 @@ package co.edu.uniquindio.compilers.semanticAnalyzer
 import co.edu.uniquindio.compilers.lexicalAnalyzer.Error
 import co.edu.uniquindio.compilers.lexicalAnalyzer.ErrorCategory
 
-class SymbolsTable() {
+class SymbolsTable(var errorList:ArrayList<Error>) {
 
-    var errorList:ArrayList<Error> = ArrayList()
     var symbolsList:ArrayList<Symbol> = ArrayList()
 
     /**
