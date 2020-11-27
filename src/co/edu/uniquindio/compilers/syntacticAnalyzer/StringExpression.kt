@@ -21,7 +21,7 @@ class StringExpression() :Expression(){
     override fun getTreeView(): TreeItem<String> {
        val root:TreeItem<String> = TreeItem("Expresión Cadena")
 
-        root.children.add(TreeItem("Cadena: $string"))
+        root.children.add(TreeItem("Cadena: ${string?.lexema}"))
         if(stringExpression != null){
             root.children.add(stringExpression?.getTreeView())
         }

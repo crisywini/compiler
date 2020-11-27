@@ -811,11 +811,11 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
 
     /**
      * <ArithmeticExpression> ::= “[“ <ArithmeticExpression> “]”[ArithmeticOperator <ArithmeticExpression>] |
-     *                          <Number>[ArithmeticOperator <ArithmeticExpression>]   |
-     *                          identifier[ArithmeticOperator <ArithmeticExpression>]
+     *                          <Number>[ArithmeticOperator <ArithmeticExpression>]
      *                          TEST = GREAT
      */
     fun isArithmeticExpression(): ArithmeticExpression? {
+        var initialPosition = currentPosition
         if (currentToken.category == Category.PARENTESIS_IZQUIERDO) {
             setNextToken()
             val expression1 = isArithmeticExpression()
@@ -841,7 +841,6 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                 reportError("Falta la expresión aritmética en la expresión aritmética")
             }
         } else {
-            val initialPosition = currentPosition
             val number = isNumericValue()
             if (number != null) {
                 setNextToken()
@@ -855,24 +854,9 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                 } else {
                     return ArithmeticExpression(number)
                 }
-            } else {
-                doBacktracking(initialPosition)
-                if (currentToken.category == Category.IDENTIFICADOR) {
-                    val identifier = currentToken
-                    setNextToken()
-                    if (currentToken.category == Category.OPERADOR_ARITMETICO) {
-                        val operator = currentToken
-                        setNextToken()
-                        val expression = isArithmeticExpression()
-                        if (expression != null) {
-                            return ArithmeticExpression(identifier, operator, expression)
-                        }
-                    } else {
-                        return ArithmeticExpression(identifier)
-                    }
-                }
             }
         }
+        doBacktracking(initialPosition)
         return null
     }
 
@@ -932,7 +916,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
      *
      */
     fun isLogicalExpression(): LogicalExpression? {
-
+        val initialPosition = currentPosition
         if (currentToken.category == Category.OPERADOR_LOGICO && currentToken.lexema == "yas") {
             val operator = currentToken
             setNextToken()
@@ -959,6 +943,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                 }
             }
         }
+        doBacktracking(initialPosition)
         return null
     }
 
@@ -968,7 +953,8 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
      *
      * Equivalent to:
      *
-     * <RelationalExpression> ::= <ArithmeticExpression> RelationalOperator <ArithmeticExpression> [RelationalOperator <RelationalExpression>]|
+     * <RelationalExpression> ::= "["<RelationalExpression> "]"  [RelationalOperator <RelationalExpression>] |
+     *                              <ArithmeticExpression> RelationalOperator <ArithmeticExpression> [RelationalOperator <RelationalExpression>]|
      *                              kronos | zeus
      *
      * <ExpresionRelacional> ::= <ExpresionAritmetica> operadorRelacional <ExpresionAritmetica> |
@@ -978,34 +964,63 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
      *
      */
     fun isRelationalExpression(): RelationalExpression? {
-        if (currentToken.category == Category.PALABRA_RESERVADA && (currentToken.lexema == "kronos" || currentToken.lexema == "zeus" || currentToken.lexema == "yas")) {
-            return RelationalExpression(currentToken)
-        } else {
-            val initialPosition = currentPosition
-            val arithmeticExpression = isArithmeticExpression()
-            if (arithmeticExpression != null) {
-                if (currentToken.category == Category.OPERADORES_RELACIONALES) {
-                    val operator = currentToken
+        val initialPosition = currentPosition
+
+        if(currentToken.category == Category.PARENTESIS_IZQUIERDO){
+            setNextToken()
+
+            val relationalExpression = isRelationalExpression()
+            if(relationalExpression != null){
+
+                if(currentToken.category == Category.PARENTESIS_DERECHO){
                     setNextToken()
-                    val arithmeticExpression2 = isArithmeticExpression()
-                    if (arithmeticExpression2 != null) {
-                        return RelationalExpression(arithmeticExpression, operator, arithmeticExpression2)
-                    } else {
-                        reportError("Falta la expresión aritmética 2 en la expresión relacional")
+                    if(currentToken.category == Category.OPERADORES_RELACIONALES){
+                        val operator = currentToken
+                        setNextToken()
+                        val relationalExpression2 = isRelationalExpression()
+                        if(relationalExpression2 != null){
+                            return RelationalExpression(relationalExpression, operator, relationalExpression)
+                        }else{
+                            reportError("Falta la expresi�n relacional 2 en la expresi�n relacional")
+                        }
+                    }else{
+                        return RelationalExpression(relationalExpression)
                     }
-                } else {
-                    reportError("Falta el operador relacional en la expresión relacional")
                 }
+
+            }
+        }else {
+            if (currentToken.category == Category.PALABRA_RESERVADA && (currentToken.lexema == "kronos" || currentToken.lexema == "zeus" || currentToken.lexema == "yas")) {
+                return RelationalExpression(currentToken)
             } else {
+                val arithmeticExpression = isArithmeticExpression()
+                if (arithmeticExpression != null) {
+                    if (currentToken.category == Category.OPERADORES_RELACIONALES) {
+                        val operator = currentToken
+                        setNextToken()
+                        val arithmeticExpression2 = isArithmeticExpression()
+                        if (arithmeticExpression2 != null) {
+                            return RelationalExpression(arithmeticExpression, operator, arithmeticExpression2)
+                        } else {
+                            reportError("Falta la expresión aritmética 2 en la expresión relacional")
+                        }
+                    } else {
+                        return RelationalExpression(arithmeticExpression)
+                    }
+                }
+                /**
+                else {
                 doBacktracking(initialPosition)
                 val expression = isExpression()
                 if (expression != null) {
-                    return RelationalExpression(expression)
+                return RelationalExpression(expression)
                 } else {
-                    reportError("Falta la expesión en la expresión relacional")
+                reportError("Falta la expesión en la expresión relacional")
                 }
+                }**/
             }
         }
+        doBacktracking(initialPosition)
         return null
     }
 

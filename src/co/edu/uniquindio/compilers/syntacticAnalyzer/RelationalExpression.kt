@@ -5,22 +5,21 @@ import javafx.scene.control.TreeItem
 
 class RelationalExpression():Expression() {
 
-    var arithmeticExpression1:ArithmeticExpression? = null
-    var arithmeticExpression2:ArithmeticExpression? = null
+    var expression1:Expression? = null
+    var expression2:Expression? = null
     var operator1:Token? = null
     var operator2:Token? = null
     var token:Token? = null
     var relationalExpression:RelationalExpression? = null
-    var expression:Expression? = null
 
     override fun getTreeView(): TreeItem<String> {
         val root:TreeItem<String> = TreeItem("Expresión Relacional")
 
-        if(arithmeticExpression1 != null){
-            root.children.add(arithmeticExpression1?.getTreeView())
+        if(expression1 != null){
+            root.children.add(expression1?.getTreeView())
         }
-        if(arithmeticExpression2 != null){
-            root.children.add(arithmeticExpression2?.getTreeView())
+        if(expression2 != null){
+            root.children.add(expression2?.getTreeView())
         }
 
         if(operator1!=null) {
@@ -37,20 +36,17 @@ class RelationalExpression():Expression() {
         }
         return root
     }
-    constructor(arithmeticExpression1:ArithmeticExpression?, operator1:Token?, arithmeticExpression2:ArithmeticExpression?):this(){
-        this.arithmeticExpression1 = arithmeticExpression1
+    constructor(expression1: Expression?, operator1:Token?, expression2: Expression?):this(){
+        this.expression1 = expression1
         this.operator1 = operator1
-        this.arithmeticExpression2 = arithmeticExpression2
+        this.expression2 = expression2
     }
     constructor(token:Token?):this(){
         this.token = token
     }
 
-    constructor(expression: Expression?):this(){
-        this.expression = expression
+    constructor(expression1: Expression?):this(){
+        this.expression1 = expression1
     }
 
-    override fun toString(): String {
-        return "RelationalExpression(arithmeticExpression1=$arithmeticExpression1, arithmeticExpression2=$arithmeticExpression2, operator1=$operator1, operator2=$operator2, token=$token, relationalExpression=$relationalExpression, expression=$expression)"
-    }
 }

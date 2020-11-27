@@ -35,4 +35,8 @@ class LogicalExpression():Expression() {
         return root
     }
 
+    override fun toString(): String {
+        return "LogicalExpression(relationalExpression1=$relationalExpression1, relationalExpression2=$relationalExpression2, logicalOperator1=$logicalOperator1)"
+    }
+
 }
