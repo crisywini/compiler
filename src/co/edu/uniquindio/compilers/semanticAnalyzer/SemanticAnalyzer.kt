@@ -9,11 +9,11 @@ class SemanticAnalyzer(var compilationUnit: CompilationUnit) {
 
     fun fillTableSymbols(){
 
-     //   compilationUnit.fillTableSymbols(symbolsTable, semanticErrorsList)
+     compilationUnit.fillTableSymbols(symbolsTable, semanticErrorsList)
     }
 
     fun analyzeSemantic(){
 
-       // compilationUnit.analyzeSemantic(symbolsTable, semanticErrorsList)
+     compilationUnit.analyzeSemantic(symbolsTable, semanticErrorsList)
     }
 }

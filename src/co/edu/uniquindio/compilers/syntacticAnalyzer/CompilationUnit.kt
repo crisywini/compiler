@@ -1,5 +1,6 @@
 package co.edu.uniquindio.compilers.syntacticAnalyzer
 
+import co.edu.uniquindio.compilers.lexicalAnalyzer.Error
 import co.edu.uniquindio.compilers.semanticAnalyzer.SymbolsTable
 import javafx.scene.control.TreeItem
 
@@ -22,13 +23,14 @@ class CompilationUnit(var functionsList:ArrayList<Function>, var variableInitial
     }
 
     fun fillTableSymbols(symbolsTable:SymbolsTable, semanticErrorsList:ArrayList<Error>){
-
-        /**
-         * IMPLEMENTAR ESTA FASE DE LA SEMÁNTICA EN UN FUTURO CERCANO
-         */
+        for(function in functionsList){
+            function.fillTableSymbols(symbolsTable, semanticErrorsList, "unidadCompilacion")
+        }
     }
 
     fun analyzeSemantic(symbolsTable:SymbolsTable, semanticErrorsList:ArrayList<Error>){
-
+        /**
+         * IMPLEMENTAR ESTA FASE DE LA SEMÁNTICA EN UN FUTURO CERCANO
+         */
     }
 }

@@ -1,5 +1,7 @@
 package co.edu.uniquindio.compilers.syntacticAnalyzer
 
+import co.edu.uniquindio.compilers.lexicalAnalyzer.Error
+import co.edu.uniquindio.compilers.semanticAnalyzer.SymbolsTable
 import javafx.scene.control.TreeItem
 
 class Decision(var logicalExpression: LogicalExpression, var statementBlock:ArrayList<Statement>, var statementBlock2: ArrayList<Statement>?) :Statement() {
@@ -30,5 +32,16 @@ class Decision(var logicalExpression: LogicalExpression, var statementBlock:Arra
             root.children.add(statemenFalse)
         }
         return root
+    }
+
+    override fun fillTableSymbols(symbolsTable: SymbolsTable, semanticErrorsList: ArrayList<Error>, ambit: String) {
+        for(statement in statementBlock){
+            statement.fillTableSymbols(symbolsTable,semanticErrorsList, ambit)
+        }
+        if(statementBlock2 != null){
+            for(statement in statementBlock2!!){
+                statement.fillTableSymbols(symbolsTable,semanticErrorsList, ambit)
+            }
+        }
     }
 }

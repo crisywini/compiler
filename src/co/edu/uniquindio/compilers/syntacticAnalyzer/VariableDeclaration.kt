@@ -1,8 +1,9 @@
 package co.edu.uniquindio.compilers.syntacticAnalyzer
 
+import co.edu.uniquindio.compilers.lexicalAnalyzer.Error
 import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
+import co.edu.uniquindio.compilers.semanticAnalyzer.SymbolsTable
 import javafx.scene.control.TreeItem
-import javafx.scene.control.TreeView
 
 class VariableDeclaration(var dataType:Token, var identifierList:ArrayList<Token>):Statement() {
     override fun toString(): String {
@@ -17,5 +18,11 @@ class VariableDeclaration(var dataType:Token, var identifierList:ArrayList<Token
         }
         root.children.add(identifierRoot)
         return root
+    }
+
+    override fun fillTableSymbols(symbolsTable: SymbolsTable, semanticErrorsList: ArrayList<Error>, ambit: String) {
+        for(variable in identifierList){
+            symbolsTable.saveSymbolValue(variable.lexema, variable.lexema, true, ambit, variable.row, variable.column)
+        }
     }
 }

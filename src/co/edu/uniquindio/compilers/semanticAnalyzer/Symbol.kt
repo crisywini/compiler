@@ -13,7 +13,7 @@ class Symbol() {
     /**
      * Constructor to create a symbol of type value
      */
-    constructor(name:String, dataType:String, modifiable:Boolean, ambit:String, row:Int, column:Int){
+    constructor(name:String, dataType:String, modifiable:Boolean, ambit:String, row:Int, column:Int):this(){
         this.name = name
         this.type = dataType
         this.modifiable = modifiable
@@ -25,7 +25,7 @@ class Symbol() {
     /**
      * Constructor to create a symbol of type method (function)
      */
-    constructor(name:String, returnType:String, paramTypes:ArrayList<String>, ambit:String){
+    constructor(name:String, returnType:String, paramTypes:ArrayList<String>, ambit:String):this(){
         this.name = name
         this.type = returnType
         this.paramTypes = paramTypes
@@ -36,7 +36,7 @@ class Symbol() {
         return if(paramTypes==null) {
             "Symbol(name='$name', type='$type', modifiable=$modifiable, ambit=$ambit, row=$row, column=$column)"
         } else {
-            "Symbol(name='$name', type='$type', column=$column, paramTypes=$paramTypes)"
+            "Symbol(name='$name', type='$type', ambit=$ambit, paramTypes=$paramTypes)"
         }
     }
 }

@@ -5,6 +5,7 @@ import co.edu.uniquindio.compilers.lexicalAnalyzer.LexicalAnalyzer
 import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
 import co.edu.uniquindio.compilers.observables.ErrorObservable
 import co.edu.uniquindio.compilers.observables.TokenObservable
+import co.edu.uniquindio.compilers.semanticAnalyzer.SemanticAnalyzer
 import co.edu.uniquindio.compilers.syntacticAnalyzer.SyntacticAnalyzer
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
@@ -55,6 +56,11 @@ class InitViewController:Initializable {
 
                 if (compilationUnit != null) {
                     treeView.root = compilationUnit.getTreeView()
+
+                    val semantic = SemanticAnalyzer(compilationUnit!!)
+                    semantic.fillTableSymbols()
+                    print(semantic.symbolsTable)
+                    print(semantic.semanticErrorsList)
                 }
                 fillErrorsTableView(lexical, syntactic)
             }else{

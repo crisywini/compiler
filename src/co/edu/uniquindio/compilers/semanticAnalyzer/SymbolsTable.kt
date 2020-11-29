@@ -25,7 +25,6 @@ class SymbolsTable(var errorList:ArrayList<Error>) {
      */
     fun saveSymbolFunction(name:String, returnType:String, paramTypes:ArrayList<String>, ambit:String, row: Int, column: Int){
         val symbol = searchSymbolFunction(name, paramTypes)
-
         if(symbol==null){
             symbolsList.add(Symbol(name, returnType, paramTypes, ambit))
         } else {
@@ -60,4 +59,10 @@ class SymbolsTable(var errorList:ArrayList<Error>) {
         }
         return null
     }
+
+    override fun toString(): String {
+        return "SymbolsTable(symbolsList=$symbolsList)"
+    }
+
+
 }
