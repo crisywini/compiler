@@ -12,4 +12,8 @@ open class Statement {
     open fun fillTableSymbols(symbolsTable: SymbolsTable, semanticErrorsList:ArrayList<Error>, ambit:String){
 
     }
+
+    open fun analyzeSemantic(symbolsTable:SymbolsTable, semanticErrorsList:ArrayList<Error>, ambit:String){
+
+    }
 }

@@ -1,6 +1,7 @@
 package co.edu.uniquindio.compilers.syntacticAnalyzer
 
 import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
+import co.edu.uniquindio.compilers.semanticAnalyzer.SymbolsTable
 import javafx.scene.control.TreeItem
 
 class RelationalExpression():Expression() {
@@ -52,5 +53,9 @@ class RelationalExpression():Expression() {
 
     override fun toString(): String {
         return "RelationalExpression(arithmeticExpression1=$arithmeticExpression1, arithmeticExpression2=$arithmeticExpression2, operator1=$operator1, operator2=$operator2, token=$token, relationalExpression=$relationalExpression, expression=$expression)"
+    }
+
+    override fun getType(symbolTable: SymbolsTable, ambit: String): String {
+        return "pulso"
     }
 }

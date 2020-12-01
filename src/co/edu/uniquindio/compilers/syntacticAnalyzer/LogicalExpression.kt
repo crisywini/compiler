@@ -1,6 +1,7 @@
 package co.edu.uniquindio.compilers.syntacticAnalyzer
 
 import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
+import co.edu.uniquindio.compilers.semanticAnalyzer.SymbolsTable
 import javafx.scene.control.TreeItem
 
 class LogicalExpression():Expression() {
@@ -33,6 +34,10 @@ class LogicalExpression():Expression() {
             root.children.add(relationalExpression2?.getTreeView())
         }
         return root
+    }
+
+    override fun getType(symbolTable: SymbolsTable, ambit: String): String {
+        return "pulso"
     }
 
 }

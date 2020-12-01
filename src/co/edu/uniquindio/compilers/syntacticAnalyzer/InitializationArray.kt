@@ -1,6 +1,8 @@
 package co.edu.uniquindio.compilers.syntacticAnalyzer
 
+import co.edu.uniquindio.compilers.lexicalAnalyzer.Error
 import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
+import co.edu.uniquindio.compilers.semanticAnalyzer.SymbolsTable
 import javafx.scene.control.TreeItem
 
 class InitializationArray (var name: Token, var dataType: Token){
@@ -15,4 +17,6 @@ class InitializationArray (var name: Token, var dataType: Token){
 
         return declaration
     }
+
+
 }

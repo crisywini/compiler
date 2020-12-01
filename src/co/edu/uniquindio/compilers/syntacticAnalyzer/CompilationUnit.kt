@@ -29,8 +29,8 @@ class CompilationUnit(var functionsList:ArrayList<Function>, var variableInitial
     }
 
     fun analyzeSemantic(symbolsTable:SymbolsTable, semanticErrorsList:ArrayList<Error>){
-        /**
-         * IMPLEMENTAR ESTA FASE DE LA SEMÁNTICA EN UN FUTURO CERCANO
-         */
+        for(function in functionsList){
+            function.analyzeSemantic(symbolsTable, semanticErrorsList)
+        }
     }
 }

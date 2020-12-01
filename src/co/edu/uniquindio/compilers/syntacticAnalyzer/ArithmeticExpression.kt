@@ -1,6 +1,8 @@
 package co.edu.uniquindio.compilers.syntacticAnalyzer
 
+import co.edu.uniquindio.compilers.lexicalAnalyzer.Category
 import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
+import co.edu.uniquindio.compilers.semanticAnalyzer.SymbolsTable
 import javafx.scene.control.TreeItem
 
 class ArithmeticExpression():Expression() {
@@ -32,7 +34,6 @@ class ArithmeticExpression():Expression() {
         this.arithmeticExpression2 = arithmeticExpression2
     }
 
-
     constructor(numericValue: NumericValue?):this(){
         this.numericValue = numericValue
     }
@@ -62,5 +63,37 @@ class ArithmeticExpression():Expression() {
             root.children.add(TreeItem("Operador aritmético: ${identifier?.lexema}"))
         }
         return root
+    }
+
+    override fun getType(symbolTable: SymbolsTable, ambit: String): String {
+      if (arithmeticExpression1 != null && arithmeticExpression2 != null){
+
+          var type1 = arithmeticExpression1!!.getType(symbolTable, ambit)
+          var type2 = arithmeticExpression2!!.getType(symbolTable, ambit)
+
+          if(type1 == "demol" || type2 == "bemol"){
+              return "bemol"
+          }
+
+        } else if (arithmeticExpression1 != null){
+          return arithmeticExpression1!!.getType(symbolTable, ambit)
+
+        } else if (numericValue != null && arithmeticExpression2 != null){
+
+        } else if ( numericValue != null){
+            if(numericValue!!.term!!.category == Category.ENTERO){
+                return "becu"
+            } else if(numericValue!!.term!!.category == Category.DECIMAL){
+                return "bemol"
+            } else {
+                val symbol = symbolTable.searchSymbolValue(numericValue!!.term!!.lexema, ambit)
+                if(symbol != null){
+                    return  symbol.type
+                }
+            }
+        } else if ( identifier != null ){
+
+      }
+        return ""
     }
 }

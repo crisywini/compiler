@@ -1,6 +1,7 @@
 package co.edu.uniquindio.compilers.syntacticAnalyzer
 
 import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
+import co.edu.uniquindio.compilers.semanticAnalyzer.SymbolsTable
 import javafx.scene.control.TreeItem
 
 class StringExpression() :Expression(){
@@ -26,5 +27,9 @@ class StringExpression() :Expression(){
             root.children.add(stringExpression?.getTreeView())
         }
         return root
+    }
+
+    override fun getType(symbolTable: SymbolsTable, ambit: String): String {
+        return "bridge"
     }
 }

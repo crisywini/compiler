@@ -41,11 +41,17 @@ class Function(var functionName: Token, var returnType: Token, var paramList: Ar
 
     fun fillTableSymbols(symbolsTable: SymbolsTable, semanticErrorsList: ArrayList<Error>, ambit: String) {
         symbolsTable.saveSymbolFunction(functionName.lexema, returnType.lexema, getParamTypes(), ambit, functionName.row, functionName.column)
-        for (param in paramList){
+        for (param in paramList) {
             symbolsTable.saveSymbolValue(param.name.lexema, param.dataType.lexema, true, functionName.lexema, param.name.row, param.name.column)
         }
-        for (statement in statementBlock){
+        for (statement in statementBlock) {
             statement.fillTableSymbols(symbolsTable, semanticErrorsList, functionName.lexema)
+        }
+    }
+
+    fun analyzeSemantic(symbolsTable: SymbolsTable, semanticErrorsList: ArrayList<Error>) {
+        for (statement in statementBlock) {
+            statement.analyzeSemantic(symbolsTable, semanticErrorsList, functionName.lexema)
         }
     }
 }

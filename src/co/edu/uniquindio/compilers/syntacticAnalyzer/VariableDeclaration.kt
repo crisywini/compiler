@@ -22,7 +22,7 @@ class VariableDeclaration(var dataType:Token, var identifierList:ArrayList<Token
 
     override fun fillTableSymbols(symbolsTable: SymbolsTable, semanticErrorsList: ArrayList<Error>, ambit: String) {
         for(variable in identifierList){
-            symbolsTable.saveSymbolValue(variable.lexema, variable.lexema, true, ambit, variable.row, variable.column)
+            symbolsTable.saveSymbolValue(variable.lexema, dataType.lexema, true, ambit, variable.row, variable.column)
         }
     }
 }

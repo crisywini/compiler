@@ -1054,7 +1054,6 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                 if (currentToken.category == Category.CORCHETE_IZQUIERDO) {
                     setNextToken()
                     if (currentToken.category == Category.CORCHETE_DERECHO) {
-
                         setNextToken()
                         var initialization = isInitializationArray()
                         if (currentToken.category == Category.TERMINAL) {
