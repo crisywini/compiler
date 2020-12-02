@@ -33,4 +33,18 @@ class CompilationUnit(var functionsList:ArrayList<Function>, var variableInitial
             function.analyzeSemantic(symbolsTable, semanticErrorsList)
         }
     }
+
+    fun getJavaCode (): String{
+        var code= "public class Principal {"
+
+        for(variable in variableInitialization){
+            code+= variable.getJavaCode()
+        }
+        for( funtion in functionsList){
+            code+= funtion.getJavaCode()
+        }
+
+        code+= "}"
+        return code
+    }
 }

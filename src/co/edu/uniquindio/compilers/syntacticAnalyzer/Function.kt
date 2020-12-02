@@ -54,4 +54,26 @@ class Function(var functionName: Token, var returnType: Token, var paramList: Ar
             statement.analyzeSemantic(symbolsTable, semanticErrorsList, functionName.lexema)
         }
     }
+
+    fun getJavaCode (): String {
+
+        var code=""
+        if(functionName.lexema=="Principal"){
+            code= "public static void main (String[] args) {"
+
+        }else{
+            code = "static" + returnType.getJavaCode() +" "+ functionName.getJavaCode()+" ("
+            for(p in paramList){
+                code+= p.getJavaCode()+","
+            }
+            code=code.substring(0,code.length-1)
+            code+=") {"
+        }
+        for(s in statementBlock){
+            code+= s.getJavaCode()
+        }
+        code+="}"
+        return code
+
+    }
 }

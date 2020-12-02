@@ -25,4 +25,14 @@ class VariableDeclaration(var dataType:Token, var identifierList:ArrayList<Token
             symbolsTable.saveSymbolValue(variable.lexema, dataType.lexema, true, ambit, variable.row, variable.column)
         }
     }
+
+    override fun getJavaCode(): String {
+        var code= dataType.getJavaCode()
+        for(variable in identifierList){
+            code+= variable.getJavaCode()+","
+        }
+        code=code.substring(0,code.length-1)
+        code+=";"
+        return code
+    }
 }

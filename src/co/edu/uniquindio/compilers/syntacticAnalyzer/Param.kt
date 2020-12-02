@@ -10,4 +10,7 @@ class Param(var name:Token, var dataType:Token) {
     fun getTreeView():TreeItem<String>{
         return TreeItem("${name.lexema} : ${dataType.lexema}")
     }
+    fun getJavaCode (): String{
+        return dataType.lexema+" "+ name.lexema
+    }
 }

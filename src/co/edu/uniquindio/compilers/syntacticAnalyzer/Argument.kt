@@ -1,6 +1,8 @@
 package co.edu.uniquindio.compilers.syntacticAnalyzer
 
+import co.edu.uniquindio.compilers.lexicalAnalyzer.Error
 import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
+import co.edu.uniquindio.compilers.semanticAnalyzer.SymbolsTable
 import javafx.scene.control.TreeItem
 
 class Argument(){
@@ -27,6 +29,9 @@ class Argument(){
             root.children.add(arithmeticExpression?.getTreeView())
         }
         return root
+    }
+    open fun getType(symbolsTable: SymbolsTable,ambit: String):String{
+        return ""
     }
 
 }

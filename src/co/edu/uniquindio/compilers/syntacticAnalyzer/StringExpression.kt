@@ -1,5 +1,6 @@
 package co.edu.uniquindio.compilers.syntacticAnalyzer
 
+import co.edu.uniquindio.compilers.lexicalAnalyzer.Error
 import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
 import co.edu.uniquindio.compilers.semanticAnalyzer.SymbolsTable
 import javafx.scene.control.TreeItem
@@ -29,7 +30,14 @@ class StringExpression() :Expression(){
         return root
     }
 
-    override fun getType(symbolTable: SymbolsTable, ambit: String): String {
+    override fun getType(symbolTable: SymbolsTable, semanticErrorsList: ArrayList<Error>, ambit: String): String {
         return "bridge"
+    }
+
+    override fun analyzeSemantic(symbolsTable: SymbolsTable, semanticErrorsList: ArrayList<Error>, ambit: String) {
+        if(stringExpression != null)
+        {
+            stringExpression!!.analyzeSemantic(symbolsTable,semanticErrorsList,ambit)
+        }
     }
 }

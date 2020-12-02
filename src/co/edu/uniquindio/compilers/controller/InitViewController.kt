@@ -6,6 +6,7 @@ import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
 import co.edu.uniquindio.compilers.observables.ErrorObservable
 import co.edu.uniquindio.compilers.observables.TokenObservable
 import co.edu.uniquindio.compilers.semanticAnalyzer.SemanticAnalyzer
+import co.edu.uniquindio.compilers.syntacticAnalyzer.CompilationUnit
 import co.edu.uniquindio.compilers.syntacticAnalyzer.SyntacticAnalyzer
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
@@ -42,6 +43,7 @@ class InitViewController:Initializable {
     @FXML lateinit var rowErrorTableColumn: TableColumn<ErrorObservable, String>
     @FXML lateinit var columnErrorTableColumn: TableColumn<ErrorObservable, String>
     @FXML lateinit var treeView:TreeView<String>
+    private var compilationUnit:CompilationUnit?=null
 
     @FXML
     fun analyze(event : ActionEvent){
@@ -52,14 +54,15 @@ class InitViewController:Initializable {
 
             if(lexical.errorList.isEmpty()) {
                 val syntactic = SyntacticAnalyzer(lexical.tokenList)
-                val compilationUnit = syntactic.isCompilationUnit()
+                compilationUnit = syntactic.isCompilationUnit()
 
                 if (compilationUnit != null) {
-                    treeView.root = compilationUnit.getTreeView()
+                    treeView.root = compilationUnit!!.getTreeView()
 
                     val semantic = SemanticAnalyzer(compilationUnit!!)
                     semantic.fillTableSymbols()
                     print(semantic.symbolsTable)
+                    semantic.analyzeSemantic()
                     print(semantic.semanticErrorsList)
                 }
                 fillErrorsTableView(lexical, syntactic)
@@ -144,5 +147,13 @@ class InitViewController:Initializable {
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         initizalize()
+    }
+
+    @FXML
+    fun translateCode(e:ActionEvent){
+
+        if(compilationUnit!=null) {
+            print(compilationUnit!!.getJavaCode())
+        }
     }
 }

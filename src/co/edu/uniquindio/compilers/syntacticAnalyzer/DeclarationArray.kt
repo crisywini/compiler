@@ -29,11 +29,6 @@ class DeclarationArray(var dataType:Token, var name: Token, var initialization: 
 
     override fun analyzeSemantic(symbolsTable: SymbolsTable, semanticErrorsList: ArrayList<Error>, ambit: String) {
 
-
-
-
-
-
         if(initialization != null){
             if(dataType.lexema != initialization!!.dataType.lexema) {
                 semanticErrorsList.add(Error("No coincide el tipo de dato, se esperaba " + dataType.lexema, name.row, name.column, ErrorCategory.ERROR_SEMANTICO))
@@ -50,7 +45,7 @@ class DeclarationArray(var dataType:Token, var name: Token, var initialization: 
                     }
                 } else {
                     if(name2.category != Category.ENTERO){
-                        semanticErrorsList.add(Error("Se esperaba un número entero", name.row, name.column, ErrorCategory.ERROR_SEMANTICO))
+                        semanticErrorsList.add(Error("Se esperaba un numero entero", name.row, name.column, ErrorCategory.ERROR_SEMANTICO))
                     }
                 }
             }

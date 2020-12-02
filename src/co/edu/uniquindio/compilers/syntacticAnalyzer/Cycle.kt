@@ -30,4 +30,20 @@ class Cycle(var logicalExpression: LogicalExpression, var statementBlock: ArrayL
             statement.fillTableSymbols(symbolsTable, semanticErrorsList, ambit)
         }
     }
+
+    override fun analyzeSemantic(symbolsTable: SymbolsTable, semanticErrorsList: ArrayList<Error>, ambit: String) {
+       logicalExpression.analyzeSemantic(symbolsTable,semanticErrorsList,ambit)
+        for (statement in statementBlock){
+            statement.analyzeSemantic(symbolsTable,semanticErrorsList,ambit)
+        }
+    }
+
+    override fun getJavaCode(): String {
+        var code= "while (" + logicalExpression.getJavaCode()+") {"
+        for (statement in statementBlock){
+            code+= statement.getJavaCode()
+        }
+        code+="}"
+        return code
+    }
 }

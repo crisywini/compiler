@@ -16,4 +16,7 @@ open class Statement {
     open fun analyzeSemantic(symbolsTable:SymbolsTable, semanticErrorsList:ArrayList<Error>, ambit:String){
 
     }
+    open fun getJavaCode (): String {
+        return ""
+    }
 }

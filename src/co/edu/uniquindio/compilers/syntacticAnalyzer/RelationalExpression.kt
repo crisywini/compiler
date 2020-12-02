@@ -1,5 +1,6 @@
 package co.edu.uniquindio.compilers.syntacticAnalyzer
 
+import co.edu.uniquindio.compilers.lexicalAnalyzer.Error
 import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
 import co.edu.uniquindio.compilers.semanticAnalyzer.SymbolsTable
 import javafx.scene.control.TreeItem
@@ -55,7 +56,18 @@ class RelationalExpression():Expression() {
         return "RelationalExpression(arithmeticExpression1=$arithmeticExpression1, arithmeticExpression2=$arithmeticExpression2, operator1=$operator1, operator2=$operator2, token=$token, relationalExpression=$relationalExpression, expression=$expression)"
     }
 
-    override fun getType(symbolTable: SymbolsTable, ambit: String): String {
+    override fun getType(symbolTable: SymbolsTable, semanticErrorsList: ArrayList<Error>, ambit: String): String {
         return "pulso"
+    }
+
+    override fun analyzeSemantic(symbolsTable: SymbolsTable, semanticErrorsList: ArrayList<Error>, ambit: String) {
+        if(arithmeticExpression1 != null && arithmeticExpression2 != null)
+        {
+            arithmeticExpression1!!.analyzeSemantic(symbolsTable,semanticErrorsList,ambit)
+            arithmeticExpression2!!.analyzeSemantic(symbolsTable,semanticErrorsList,ambit)
+
+        }else if(expression != null) {
+            expression!!.analyzeSemantic(symbolsTable,semanticErrorsList,ambit)
+        }
     }
 }
