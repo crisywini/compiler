@@ -6,8 +6,10 @@ import co.edu.uniquindio.compilers.semanticAnalyzer.SymbolsTable
 import javafx.scene.control.TreeItem
 
 class StringExpression() :Expression(){
+
     var string:Token? = null
     var stringExpression:StringExpression? = null
+
     constructor(string:Token?, stringExpression: StringExpression?):this(){
         this.string = string
         this.stringExpression = stringExpression
@@ -39,5 +41,15 @@ class StringExpression() :Expression(){
         {
             stringExpression!!.analyzeSemantic(symbolsTable,semanticErrorsList,ambit)
         }
+    }
+
+    override fun getJavaCode(): String {
+        var code= string!!.getJavaCode()
+
+        if(stringExpression != null){
+            code+= "+" + stringExpression!!.getJavaCode()
+        }
+        code+= ";"
+        return code
     }
 }

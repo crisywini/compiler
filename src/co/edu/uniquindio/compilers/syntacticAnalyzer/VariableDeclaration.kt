@@ -27,7 +27,7 @@ class VariableDeclaration(var dataType:Token, var identifierList:ArrayList<Token
     }
 
     override fun getJavaCode(): String {
-        var code= dataType.getJavaCode()
+        var code= dataType.getJavaCode()+" "
         for(variable in identifierList){
             code+= variable.getJavaCode()+","
         }

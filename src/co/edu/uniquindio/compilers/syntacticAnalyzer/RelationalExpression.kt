@@ -70,4 +70,15 @@ class RelationalExpression():Expression() {
             expression!!.analyzeSemantic(symbolsTable,semanticErrorsList,ambit)
         }
     }
+
+    override fun getJavaCode(): String {
+        if(arithmeticExpression1 != null && arithmeticExpression2 != null){
+            return arithmeticExpression1!!.getJavaCode() + operator1!!.getJavaCode() + arithmeticExpression2!!.getJavaCode()
+        }else if(expression != null){
+            return expression!!.getJavaCode()
+        }else if(token != null){
+            return token!!.getJavaCode()
+        }
+        return ""
+    }
 }

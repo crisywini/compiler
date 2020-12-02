@@ -28,6 +28,16 @@
                         </ImageView>
                      </graphic>
                   </Button>
+                   <Button fx:id="translateButton" mnemonicParsing="false" onAction="#translateCode" prefHeight="46.0" prefWidth="51.0" style="-fx-border-radius: 30px;" textAlignment="CENTER">
+                       <graphic>
+                           <ImageView fx:id="imageButton2" fitHeight="30.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                               <image>
+                                   <!-- <div>Iconos diseñados por <a href="https://www.flaticon.es/autores/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.es/" title="Flaticon">www.flaticon.es</a></div> -->
+                                   <Image url="@images/analyzer.png" />
+                               </image>
+                           </ImageView>
+                       </graphic>
+                   </Button>
                </children>
             </HBox>
             <HBox alignment="CENTER" prefHeight="43.0" prefWidth="800.0">

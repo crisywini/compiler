@@ -680,12 +680,6 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
             return statement
         }
 
-        statement = isDeclarationArray()
-        println("SENTENCIA DECLARACION ARREGLO? ${statement != null}")
-        if (statement != null) {
-            return statement
-        }
-
         //BIEN
         statement = isFunctionInvocation()
         println("SENTENCIA INVOCACIÓN DE FUNCIÓN? ${statement != null}")
@@ -737,6 +731,16 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
 
         statement = isPrint()
         println("SENTENCIA IMPRESIÓN? ${statement != null}")
+        if (statement != null) {
+            return statement
+        }
+        statement = isDeclarationArray()
+        println("DECLARACION ARREGLO? ${statement != null}")
+        if (statement != null) {
+            return statement
+        }
+        statement = isInitializationArray()
+        println("INICIALIZACION ARREGLO? ${statement != null}")
         if (statement != null) {
             return statement
         }

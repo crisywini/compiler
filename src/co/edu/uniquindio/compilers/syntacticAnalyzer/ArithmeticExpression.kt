@@ -162,4 +162,25 @@ class ArithmeticExpression():Expression() {
             arithmeticExpression2!!.analyzeSemantic(symbolsTable,semanticErrorsList,ambit)
         }
     }
+
+    override fun getJavaCode(): String {
+        if(arithmeticExpression1 != null && operator!= null && arithmeticExpression2 != null){
+            return "("+arithmeticExpression1!!.getJavaCode()+ ")"+ operator!!.getJavaCode()+ arithmeticExpression2!!.getJavaCode()
+
+        }else if(arithmeticExpression1 != null && operator== null && arithmeticExpression2 == null && numericValue == null){
+            return "("+arithmeticExpression1!!.getJavaCode()+ ")"
+
+        }else if(numericValue != null && operator!= null && arithmeticExpression2 != null ){
+            return numericValue!!.getJavaCode()+ operator!!.getJavaCode()+ arithmeticExpression2!!.getJavaCode()
+
+        }else if(identifier != null && operator != null && arithmeticExpression2 != null){
+            return identifier!!.getJavaCode()+ operator!!.getJavaCode()+ arithmeticExpression2!!.getJavaCode()
+
+        }else if(identifier != null && arithmeticExpression1 == null && operator== null && arithmeticExpression2 == null && numericValue == null){
+            return identifier!!.getJavaCode()
+
+        } else{
+            return numericValue!!.getJavaCode()
+        }
+    }
 }

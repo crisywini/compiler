@@ -63,10 +63,13 @@ class Function(var functionName: Token, var returnType: Token, var paramList: Ar
 
         }else{
             code = "static" + returnType.getJavaCode() +" "+ functionName.getJavaCode()+" ("
-            for(p in paramList){
-                code+= p.getJavaCode()+","
+
+            if(paramList.isNotEmpty()) {
+                for (p in paramList) {
+                    code += p.getJavaCode() + ","
+                }
+                code = code.substring(0, code.length - 1)
             }
-            code=code.substring(0,code.length-1)
             code+=") {"
         }
         for(s in statementBlock){

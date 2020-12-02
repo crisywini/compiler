@@ -7,7 +7,7 @@ import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
 import co.edu.uniquindio.compilers.semanticAnalyzer.SymbolsTable
 import javafx.scene.control.TreeItem
 
-class DeclarationArray(var dataType:Token, var name: Token, var initialization: InitializationArray?):Statement() {
+class DeclarationArray(var dataType:Token, var name: Token, var initialization: InitializationArray?): Statement() {
     override fun getTreeView(): TreeItem<String> {
         val declaration: TreeItem<String> = TreeItem("Declaración Arreglo")
         declaration.children.add(TreeItem("Tipo de dato: ${dataType.lexema}"))
@@ -50,5 +50,17 @@ class DeclarationArray(var dataType:Token, var name: Token, var initialization: 
                 }
             }
         }
+    }
+
+    override fun getJavaCode(): String {
+        var code= dataType.getJavaCode() + "[]" + name.getJavaCode()
+
+        if(initialization != null){
+            code+= "= ["
+            code += initialization!!.getJavaCode()
+            code+= "]"
+        }
+        code+= ";"
+        return code
     }
 }
