@@ -30,8 +30,10 @@ class Assignment(var identifier:Token, var expression:Expression):Statement() {
             var type= symbol.type
             if(expression != null)
             {
+
                 expression!!.analyzeSemantic(symbolsTable,semanticErrorsList,ambit)
                 var typeExpresssion= expression.getType(symbolsTable,semanticErrorsList,ambit)
+
                 if(typeExpresssion != type)
                 {
                     semanticErrorsList.add(Error("El tipo de dato de la expresion o identificador es ($typeExpresssion) y no coincide con el tipo de dato del campo (${identifier.lexema}) que es de tipo ($type)", identifier.row, identifier.column, ErrorCategory.ERROR_SEMANTICO))
@@ -40,5 +42,13 @@ class Assignment(var identifier:Token, var expression:Expression):Statement() {
             }
         }
 
+    }
+
+    override fun getJavaCode(): String {
+        var code= ""
+        code+= identifier!!.getJavaCode()+"="
+        code+=expression!!.getJavaCode()
+        code+=";"
+        return code
     }
 }

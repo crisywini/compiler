@@ -1,6 +1,7 @@
 package co.edu.uniquindio.compilers.syntacticAnalyzer
 
 import co.edu.uniquindio.compilers.lexicalAnalyzer.Error
+import co.edu.uniquindio.compilers.lexicalAnalyzer.ErrorCategory
 import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
 import co.edu.uniquindio.compilers.semanticAnalyzer.SymbolsTable
 import javafx.scene.control.TreeItem
@@ -40,29 +41,67 @@ class Function(var functionName: Token, var returnType: Token, var paramList: Ar
     }
 
     fun fillTableSymbols(symbolsTable: SymbolsTable, semanticErrorsList: ArrayList<Error>, ambit: String) {
-        symbolsTable.saveSymbolFunction(functionName.lexema, returnType.lexema, getParamTypes(), ambit, functionName.row, functionName.column)
-        for (param in paramList) {
-            symbolsTable.saveSymbolValue(param.name.lexema, param.dataType.lexema, true, functionName.lexema, param.name.row, param.name.column)
+
+        var paramLi=ArrayList<String>()
+        for(param in paramList){
+            paramLi.add(param.dataType.lexema)
         }
-        for (statement in statementBlock) {
-            statement.fillTableSymbols(symbolsTable, semanticErrorsList, functionName.lexema)
+        var symbol=symbolsTable.searchSymbolFunction(functionName.lexema,paramLi)
+        if(symbol ==null) {
+
+            symbolsTable.saveSymbolFunction(functionName.lexema, returnType.lexema, getParamTypes(), ambit, functionName.row, functionName.column)
+            for (param in paramList) {
+                symbolsTable.saveSymbolValue(param.name.lexema, param.dataType.lexema, true, functionName.lexema, param.name.row, param.name.column)
+            }
+            for (statement in statementBlock) {
+                statement.fillTableSymbols(symbolsTable, semanticErrorsList, functionName.lexema)
+            }
+        }else{
+            semanticErrorsList.add(Error("La funcion ${functionName.lexema} ya existe ", functionName.row, functionName.column, ErrorCategory.ERROR_SEMANTICO))
         }
     }
 
     fun analyzeSemantic(symbolsTable: SymbolsTable, semanticErrorsList: ArrayList<Error>) {
+        var flag=false
         for (statement in statementBlock) {
             statement.analyzeSemantic(symbolsTable, semanticErrorsList, functionName.lexema)
+            if(statement is Return) {
+                if (returnType.lexema != "dacapo") {
+                    flag = true
+                    statement as Return
+                    var ident = statement.identifier
+                    if (ident == null) {
+                        if (returnType.lexema != statement.expression!!.getType(symbolsTable, semanticErrorsList, functionName.lexema)) {
+                            semanticErrorsList.add(Error("El tipo de dato de la funcion $functionName no coincide con el tipo de dato del retorno  ", returnType.row, returnType.column, ErrorCategory.ERROR_SEMANTICO))
+
+                        }
+                    } else {
+                        var symbol = symbolsTable.searchSymbolValue(ident!!.lexema, functionName.lexema)
+                        if (symbol == null) {
+                            semanticErrorsList.add(Error("La variable ${ident.lexema} no esta declarada ", ident.row, ident.column, ErrorCategory.ERROR_SEMANTICO))
+                        } else if (returnType.lexema != symbol.type) {
+                            semanticErrorsList.add(Error("El tipo de dato de la funcion ${functionName.lexema} no coincide con el tipo de dato del retorno  ", returnType.row, returnType.column, ErrorCategory.ERROR_SEMANTICO))
+
+                        }
+                    }
+                }else{
+                    semanticErrorsList.add(Error("La funcion no puede retornar ", returnType.row, returnType.column, ErrorCategory.ERROR_SEMANTICO))
+                }
+            }
+        }
+        if(flag==false && returnType.lexema != "dacapo"){
+            semanticErrorsList.add(Error("No existe ningun retorno ", returnType.row, returnType.column, ErrorCategory.ERROR_SEMANTICO))
         }
     }
 
     fun getJavaCode (): String {
 
         var code=""
-        if(functionName.lexema=="Principal"){
+        if(functionName.lexema=="~Principal"){
             code= "public static void main (String[] args) {"
 
         }else{
-            code = "static" + returnType.getJavaCode() +" "+ functionName.getJavaCode()+" ("
+            code = "public static " + returnType.getJavaCode() +" "+ functionName.getJavaCode()+" ("
 
             if(paramList.isNotEmpty()) {
                 for (p in paramList) {

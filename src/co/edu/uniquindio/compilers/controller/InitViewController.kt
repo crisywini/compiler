@@ -70,8 +70,10 @@ class InitViewController:Initializable {
                     print(semantic!!.semanticErrorsList)
                     fillErrorsTableView(lexical!!,syntactic!!,semantic!!)
 
+                }else{
+                    fillErrorsTableView(lexical!!, syntactic!!)
                 }
-                fillErrorsTableView(lexical!!, syntactic!!)
+
             }else{
                 fillErrorsTableView(lexical!!)
                 RootViewController.showAlert("Existen errores léxicos","ADVERTENCIA",Alert.AlertType.WARNING)
@@ -178,6 +180,7 @@ class InitViewController:Initializable {
     @FXML
     fun translateCode(e:ActionEvent){
     if(lexical!!.errorList.isEmpty() && syntactic!!.errorList.isEmpty() && semantic!!.semanticErrorsList.isEmpty()){
+
         val code= compilationUnit!!.getJavaCode()
         File ("src/Principal.java").writeText(code)
         val runtime = Runtime.getRuntime().exec("javac src/Principal.java")

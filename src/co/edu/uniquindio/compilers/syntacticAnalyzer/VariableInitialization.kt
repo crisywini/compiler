@@ -16,4 +16,9 @@ class VariableInitialization(var dataType:Token?, var identifier:Token?, var val
     override fun toString(): String {
         return "VariableInitialization(dataType=$dataType, identifier=$identifier, value=$value)"
     }
+    override fun getJavaCode(): String {
+        var code=identifier!!.getJavaCode()+"="
+        code+=value!!.getJavaCode()+";"
+        return code
+    }
 }

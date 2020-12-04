@@ -45,9 +45,9 @@ class Return() :Statement(){
     }
 
     override fun getJavaCode(): String {
-        var code="return"
+        var code="return "
         if(identifier !=null){
-            code+= identifier!!.lexema
+            code+= identifier!!.getJavaCode()
         }else if(expression!=null){
             code+= expression!!.getJavaCode()
         }

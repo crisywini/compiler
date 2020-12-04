@@ -35,7 +35,7 @@ class CompilationUnit(var functionsList:ArrayList<Function>, var variableInitial
     }
 
     fun getJavaCode (): String{
-        var code= "import javax.swing.JOptionPan; public class Principal {"
+        var code= "import javax.swing.JOptionPane; public class Principal {"
 
         for(variable in variableInitialization){
             code+= variable.getJavaCode()

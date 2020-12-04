@@ -49,7 +49,6 @@ class StringExpression() :Expression(){
         if(stringExpression != null){
             code+= "+" + stringExpression!!.getJavaCode()
         }
-        code+= ";"
         return code
     }
 }

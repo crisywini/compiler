@@ -37,4 +37,15 @@ class Print(var variableName: Token?, var expression: Expression?) :Statement() 
         }
 
     }
+
+    override fun getJavaCode(): String {
+        var code= "JOptionPane.showMessageDialog(null,"
+        if(expression != null){
+            code+=expression!!.getJavaCode()
+        }else{
+            code+= variableName!!.getJavaCode()
+        }
+        code+=");"
+        return code
+    }
 }

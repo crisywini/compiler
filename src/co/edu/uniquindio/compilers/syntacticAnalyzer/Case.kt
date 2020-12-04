@@ -17,4 +17,10 @@ class Case (var dataType: Token, var statement: Statement){
 
         return tree
     }
+    fun getJavaCode (): String {
+        var code=" case"+ dataType.getJavaCode()+":"
+        code+= statement.getJavaCode()+";"
+        code+= "break;"
+        return code
+    }
 }
