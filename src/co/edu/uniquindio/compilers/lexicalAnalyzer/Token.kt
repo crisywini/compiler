@@ -75,8 +75,8 @@ class Token (var lexema:String, var category:Category, var row:Int, var column:I
                 return ">="
             }else if(lexema=="<:"){
                 return "<="
-            }else if(lexema=="=="){
-                return "::"
+            }else if(lexema=="::"){
+                return "=="
             }else if(lexema=="!:"){
                 return "!="
             }

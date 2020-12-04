@@ -56,7 +56,7 @@ class DeclarationArray(var dataType:Token, var name: Token, var initialization: 
         var code= dataType.getJavaCode() + "[]" + name.getJavaCode()
 
         if(initialization != null){
-            code+= "= new" + dataType.getJavaCode() + "["
+            code+= "= new " + dataType.getJavaCode() + "["
             code += initialization!!.getJavaCode()
             code+= "]"
         }
