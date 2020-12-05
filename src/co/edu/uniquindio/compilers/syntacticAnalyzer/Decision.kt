@@ -1,5 +1,7 @@
 package co.edu.uniquindio.compilers.syntacticAnalyzer
 
+import co.edu.uniquindio.compilers.lexicalAnalyzer.Error
+import co.edu.uniquindio.compilers.semanticAnalyzer.SymbolsTable
 import javafx.scene.control.TreeItem
 
 class Decision(var logicalExpression: LogicalExpression, var statementBlock:ArrayList<Statement>, var statementBlock2: ArrayList<Statement>?) :Statement() {
@@ -30,5 +32,49 @@ class Decision(var logicalExpression: LogicalExpression, var statementBlock:Arra
             root.children.add(statemenFalse)
         }
         return root
+    }
+
+    override fun fillTableSymbols(symbolsTable: SymbolsTable, semanticErrorsList: ArrayList<Error>, ambit: String) {
+        for(statement in statementBlock){
+            statement.fillTableSymbols(symbolsTable,semanticErrorsList, ambit)
+        }
+        if(statementBlock2 != null){
+            for(statement in statementBlock2!!){
+                statement.fillTableSymbols(symbolsTable,semanticErrorsList, ambit)
+            }
+        }
+    }
+
+    override fun analyzeSemantic(symbolsTable: SymbolsTable, semanticErrorsList: ArrayList<Error>, ambit: String) {
+
+        if(logicalExpression != null){
+            logicalExpression.analyzeSemantic(symbolsTable,semanticErrorsList,ambit)
+        }
+        for (statement in statementBlock){
+            statement.analyzeSemantic(symbolsTable,semanticErrorsList,ambit)
+        }
+        if(statementBlock2 != null)
+        {
+            for (statement in statementBlock2!!){
+                statement.analyzeSemantic(symbolsTable,semanticErrorsList,ambit)
+            }
+        }
+
+    }
+
+    override fun getJavaCode(): String {
+        var code= "if (" + logicalExpression.getJavaCode()+") {"
+        for (statement in statementBlock){
+            code+= statement.getJavaCode()
+        }
+        code+="}"
+        if(statementBlock2 != null)
+        {  code+="else {"
+            for (statement in statementBlock2!!){
+                code+=statement.getJavaCode()
+            }
+            code+="}"
+        }
+        return code
     }
 }

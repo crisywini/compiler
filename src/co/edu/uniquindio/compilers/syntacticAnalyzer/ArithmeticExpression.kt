@@ -1,6 +1,10 @@
 package co.edu.uniquindio.compilers.syntacticAnalyzer
 
+import co.edu.uniquindio.compilers.lexicalAnalyzer.Category
+import co.edu.uniquindio.compilers.lexicalAnalyzer.Error
+import co.edu.uniquindio.compilers.lexicalAnalyzer.ErrorCategory
 import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
+import co.edu.uniquindio.compilers.semanticAnalyzer.SymbolsTable
 import javafx.scene.control.TreeItem
 
 class ArithmeticExpression():Expression() {
@@ -32,7 +36,6 @@ class ArithmeticExpression():Expression() {
         this.arithmeticExpression2 = arithmeticExpression2
     }
 
-
     constructor(numericValue: NumericValue?):this(){
         this.numericValue = numericValue
     }
@@ -62,5 +65,122 @@ class ArithmeticExpression():Expression() {
             root.children.add(TreeItem("Operador aritmético: ${identifier?.lexema}"))
         }
         return root
+    }
+
+    override fun getType(symbolTable: SymbolsTable, semanticErrorsList: ArrayList<Error>, ambit: String): String {
+        if (arithmeticExpression1 != null && arithmeticExpression2 != null) {
+
+            var type1 = arithmeticExpression1!!.getType(symbolTable,semanticErrorsList,ambit)
+            var type2 = arithmeticExpression2!!.getType(symbolTable,semanticErrorsList ,ambit)
+
+            if (type1 == "bemol" || type2 == "bemol") {
+                return "bemol"
+            } else {
+                return "becu"
+            }
+
+        } else if (arithmeticExpression1 != null) {
+            return arithmeticExpression1!!.getType(symbolTable,semanticErrorsList ,ambit)
+
+        } else if (numericValue != null && arithmeticExpression2 != null) {
+            var type1 = ""
+
+            if(numericValue!!.term!!.category == Category.ENTERO){
+                type1= "becu"
+            } else if(numericValue!!.term!!.category == Category.DECIMAL){
+                type1= "bemol"
+            } else {
+                val symbol = symbolTable.searchSymbolValue(numericValue!!.term!!.lexema, ambit)
+                if(symbol != null){
+                    type1 = symbol.type
+                }else{
+                    semanticErrorsList.add(Error("El campo ${numericValue!!.term!!.lexema} no existe dentro del ambito $ambit ", numericValue!!.term!!.row, numericValue!!.term!!.column, ErrorCategory.ERROR_SEMANTICO))
+                }
+            }
+
+            var type2 = arithmeticExpression2!!.getType(symbolTable,semanticErrorsList, ambit)
+
+            if (type1 == "bemol" || type2 == "bemol") {
+                return "bemol"
+            } else {
+                return "becu"
+            }
+
+        } else if(identifier != null && arithmeticExpression2 != null){
+
+            var type1 = ""
+            val symbol = symbolTable.searchSymbolValue(identifier!!.lexema, ambit)
+            if(symbol != null){
+                type1 = symbol.type
+            }
+            else{
+                semanticErrorsList.add(Error("El campo ${identifier!!.lexema} no existe dentro del ambito $ambit ", identifier!!.row, identifier!!.column, ErrorCategory.ERROR_SEMANTICO))
+            }
+
+            var type2 = arithmeticExpression2!!.getType(symbolTable,semanticErrorsList ,ambit)
+
+            if (type1 == "bemol" || type2 == "bemol") {
+                return "bemol"
+            } else {
+                return "becu"
+            }
+
+        }  else if ( numericValue != null) {
+           if(numericValue!!.term!!.category == Category.ENTERO){
+                return "becu"
+            } else if(numericValue!!.term!!.category == Category.DECIMAL){
+                return "bemol"
+            } else {
+                val symbol = symbolTable.searchSymbolValue(numericValue!!.term!!.lexema, ambit)
+                if(symbol != null){
+                    return  symbol.type
+                }
+            }
+        } else if ( identifier != null ){
+            val symbol = symbolTable.searchSymbolValue(identifier!!.lexema, ambit)
+            if(symbol != null){
+                return  symbol.type
+            }
+      }
+        return ""
+    }
+
+    override fun analyzeSemantic(symbolsTable: SymbolsTable, semanticErrorsList: ArrayList<Error>, ambit: String) {
+        if(numericValue != null){
+            if(numericValue!!.term!!.category == Category.IDENTIFICADOR){
+                var symbol=symbolsTable.searchSymbolValue(numericValue!!.term!!.lexema, ambit)
+                if(symbol==null){
+                    //capturar el simbolo.tipo y preguntar si es numerico si no es entero o decimal hay que reportar error semantico
+                    semanticErrorsList.add(Error("El campo (${numericValue!!.term!!.lexema}) no existe dentro del ambito ($ambit) ", numericValue!!.term!!.row, numericValue!!.term!!.column, ErrorCategory.ERROR_SEMANTICO))
+                }
+            }
+        }
+        if(arithmeticExpression1 != null){
+            arithmeticExpression1!!.analyzeSemantic(symbolsTable,semanticErrorsList,ambit)
+        }
+        if(arithmeticExpression2 != null){
+            arithmeticExpression2!!.analyzeSemantic(symbolsTable,semanticErrorsList,ambit)
+        }
+    }
+
+    override fun getJavaCode(): String {
+        if(arithmeticExpression1 != null && operator!= null && arithmeticExpression2 != null){
+            return "("+arithmeticExpression1!!.getJavaCode()+ ")"+ operator!!.getJavaCode()+ arithmeticExpression2!!.getJavaCode()
+
+        }else if(arithmeticExpression1 != null && operator== null && arithmeticExpression2 == null && numericValue == null){
+            return "("+arithmeticExpression1!!.getJavaCode()+ ")"
+
+        }else if(numericValue != null && operator!= null && arithmeticExpression2 != null ){
+            return numericValue!!.getJavaCode()+ operator!!.getJavaCode()+ arithmeticExpression2!!.getJavaCode()
+
+        }else if(identifier != null && operator != null && arithmeticExpression2 != null){
+            return identifier!!.getJavaCode()+ operator!!.getJavaCode()+ arithmeticExpression2!!.getJavaCode()
+
+        }else if(identifier != null && arithmeticExpression1 == null && operator== null && arithmeticExpression2 == null && numericValue == null){
+            return identifier!!.getJavaCode()
+
+        } else{
+            return numericValue!!.getJavaCode()
+        }
     }
 }

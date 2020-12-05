@@ -5,6 +5,8 @@ import co.edu.uniquindio.compilers.lexicalAnalyzer.LexicalAnalyzer
 import co.edu.uniquindio.compilers.lexicalAnalyzer.Token
 import co.edu.uniquindio.compilers.observables.ErrorObservable
 import co.edu.uniquindio.compilers.observables.TokenObservable
+import co.edu.uniquindio.compilers.semanticAnalyzer.SemanticAnalyzer
+import co.edu.uniquindio.compilers.syntacticAnalyzer.CompilationUnit
 import co.edu.uniquindio.compilers.syntacticAnalyzer.SyntacticAnalyzer
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
@@ -14,6 +16,7 @@ import javafx.scene.control.*
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
+import java.io.File
 import java.net.URL
 import java.util.*
 
@@ -41,24 +44,38 @@ class InitViewController:Initializable {
     @FXML lateinit var rowErrorTableColumn: TableColumn<ErrorObservable, String>
     @FXML lateinit var columnErrorTableColumn: TableColumn<ErrorObservable, String>
     @FXML lateinit var treeView:TreeView<String>
+    private var compilationUnit:CompilationUnit?=null
+    private var lexical:LexicalAnalyzer?=null
+    private var syntactic:SyntacticAnalyzer?=null
+    private var semantic:SemanticAnalyzer?=null
 
     @FXML
     fun analyze(event : ActionEvent){
         if(sourceCodeTextArea.length>0){
-            val lexical = LexicalAnalyzer(sourceCodeTextArea.text)
-            lexical.analyze()
-            fillTokensTableView(lexical)
+            lexical = LexicalAnalyzer(sourceCodeTextArea.text)
+            lexical!!.analyze()
+            fillTokensTableView(lexical!!)
 
-            if(lexical.errorList.isEmpty()) {
-                val syntactic = SyntacticAnalyzer(lexical.tokenList)
-                val compilationUnit = syntactic.isCompilationUnit()
+            if(lexical!!.errorList.isEmpty()) {
+                syntactic = SyntacticAnalyzer(lexical!!.tokenList)
+                compilationUnit = syntactic!!.isCompilationUnit()
 
                 if (compilationUnit != null) {
-                    treeView.root = compilationUnit.getTreeView()
+                    treeView.root = compilationUnit!!.getTreeView()
+
+                    semantic = SemanticAnalyzer(compilationUnit!!)
+                    semantic!!.fillTableSymbols()
+                    print(semantic!!.symbolsTable)
+                    semantic!!.analyzeSemantic()
+                    print(semantic!!.semanticErrorsList)
+                    fillErrorsTableView(lexical!!,syntactic!!,semantic!!)
+
+                }else{
+                    fillErrorsTableView(lexical!!, syntactic!!)
                 }
-                fillErrorsTableView(lexical, syntactic)
+
             }else{
-                fillErrorsTableView(lexical)
+                fillErrorsTableView(lexical!!)
                 RootViewController.showAlert("Existen errores léxicos","ADVERTENCIA",Alert.AlertType.WARNING)
             }
 
@@ -107,6 +124,26 @@ class InitViewController:Initializable {
 
         errorsTableView.refresh()
     }
+    /**
+     * Fill Errors Table View method
+     */
+    private fun fillErrorsTableView(lexical:LexicalAnalyzer, syntacticAnalyzer: SyntacticAnalyzer,semanticAnalyzer: SemanticAnalyzer){
+        errorsTableView.items.clear()
+        for(element in lexical.errorList){
+            errorsTableView.items.add(ErrorObservable(element.error, "".plus(element.row), "".plus(element.column)
+                    , element.errorCategory.toString()))
+        }
+        for(element in syntacticAnalyzer.errorList){
+            errorsTableView.items.add(ErrorObservable(element.error, "".plus(element.row), "".plus(element.column)
+                    , element.errorCategory.toString()))
+        }
+        for(element in semanticAnalyzer.semanticErrorsList){
+            errorsTableView.items.add(ErrorObservable(element.error, "".plus(element.row), "".plus(element.column)
+                    , element.errorCategory.toString()))
+        }
+
+        errorsTableView.refresh()
+    }
 
     /**
      * Initizalize method
@@ -138,5 +175,25 @@ class InitViewController:Initializable {
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         initizalize()
+    }
+
+    @FXML
+    fun translateCode(e:ActionEvent){
+    if(lexical!!.errorList.isEmpty() && syntactic!!.errorList.isEmpty() && semantic!!.semanticErrorsList.isEmpty()){
+
+        val code= compilationUnit!!.getJavaCode()
+        File ("src/Principal.java").writeText(code)
+        val runtime = Runtime.getRuntime().exec("javac src/Principal.java")
+        runtime.waitFor()
+        Runtime.getRuntime().exec("java Principal", null, File("src"))
+
+     }else{
+       val alert=Alert(Alert.AlertType.ERROR)
+       alert.headerText=null
+       alert.contentText="El codigo no se puede traducir por que hay errores"
+       alert.show()
+
+     }
+
     }
 }

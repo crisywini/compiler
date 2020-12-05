@@ -93,7 +93,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                             setNextToken()
                             return VariableDeclaration(dataType, identifierList)
                         } else {
-                            reportError("Falta el terminal \\")
+                            doBacktracking(initialPosition)
                         }
                     } else {
                         reportError("Faltan los identificadores")
@@ -211,6 +211,53 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                 }
             } else {
                 doBacktracking(initialPosition)
+            }
+        }
+        return null
+    }
+
+    /**
+     * <MutableVariableInitialization> ::= <DataType> tutti “;” identifier “:” <Value> “\”
+     *
+     */
+    fun isMutableVariableInitialization(): VariableInitialization? {
+        val initialPosition1 = currentPosition
+        val dataType = isDataType()
+        if (dataType != null) {
+            setNextToken()
+            if (currentToken.category == Category.PALABRA_RESERVADA && currentToken.lexema == "tutti") {
+                setNextToken()
+                if (currentToken.category == Category.DOS_PUNTOS) {
+                    setNextToken()
+                    if (currentToken.category == Category.IDENTIFICADOR) {
+                        val identifier = currentToken
+                        setNextToken()
+                        val initialPosition2 = currentPosition
+                        if (currentToken.category == Category.OPERADOR_ASIGNACION) {
+                            setNextToken()
+                            val value = isValue()
+                            if (value != null) {
+                                setNextToken()
+                                if (currentToken.category == Category.TERMINAL) {
+                                    setNextToken()
+                                    return VariableInitialization(dataType, identifier, value)
+                                } else {
+                                    reportError("Falta la terminal en la variable inmutable")
+                                }
+                            } else {
+                                reportError("Falta el valor de la variable en la variable inmutable")
+                            }
+                        } else {
+                            doBacktracking(initialPosition2)
+                        }
+                    } else {
+                        reportError("Falta el identificador en la variable inmutable")
+                    }
+                } else {
+                    reportError("Falta el ; en la variable inmutable")
+                }
+            } else {
+                doBacktracking(initialPosition1)
             }
         }
         return null
@@ -662,26 +709,23 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
 
         var statement: Statement?
 
-        statement = isImmutableVariableInitialization()
-        if(statement !=null){
-            return statement
-        }
-
-
         statement = isVariableDeclaration()
         println("SENTENCIA DECLARACIÓN DE VARIABLE? ${statement != null}")
         if (statement != null) {
             return statement
         }
 
-        statement = isCasting()
-        println("SENTENCIA CASTING? ${statement != null}")
-        if (statement != null) {
+        statement = isImmutableVariableInitialization()
+        if(statement !=null){
+            return statement
+        }
+        statement = isMutableVariableInitialization()
+        if(statement !=null){
             return statement
         }
 
-        statement = isDeclarationArray()
-        println("SENTENCIA DECLARACION ARREGLO? ${statement != null}")
+        statement = isCasting()
+        println("SENTENCIA CASTING? ${statement != null}")
         if (statement != null) {
             return statement
         }
@@ -740,6 +784,16 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
         if (statement != null) {
             return statement
         }
+        statement = isDeclarationArray()
+        println("DECLARACION ARREGLO? ${statement != null}")
+        if (statement != null) {
+            return statement
+        }
+        statement = isInitializationArray()
+        println("INICIALIZACION ARREGLO? ${statement != null}")
+        if (statement != null) {
+            return statement
+        }
         //BIEN
         statement = isSwitch()
         println("SENTENCIA SWITCH? ${statement != null}")
@@ -783,7 +837,14 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
      *                      <LogicExpression> | <StringExpression>
      */
     fun isExpression(): Expression? {
-        var expression: Expression? = isArithmeticExpression()
+
+        var expression: Expression?  = isStringExpression()
+
+        if (expression != null) {
+            return expression
+        }
+
+        expression= isArithmeticExpression()
         println("ARITMÉTICA ${expression!=null}")
         if (expression != null) {
             return expression
@@ -796,11 +857,6 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
         }
         expression = isLogicalExpression()
         println("LÓGICA ${expression!=null}")
-
-        if (expression != null) {
-            return expression
-        }
-        expression = isStringExpression()
 
         if (expression != null) {
             return expression
@@ -1030,7 +1086,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
         if (currentToken.category == Category.PALABRA_RESERVADA) {
             if (currentToken.lexema == "becu" || currentToken.lexema == "pulso"
                     || currentToken.lexema == "largo" || currentToken.lexema == "ante"
-                    || currentToken.lexema == "bridge") {
+                    || currentToken.lexema == "bridge" || currentToken.lexema == "dacapo"|| currentToken.lexema == "bemol") {
                 return currentToken
             }
         }
@@ -1054,7 +1110,6 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                 if (currentToken.category == Category.CORCHETE_IZQUIERDO) {
                     setNextToken()
                     if (currentToken.category == Category.CORCHETE_DERECHO) {
-
                         setNextToken()
                         var initialization = isInitializationArray()
                         if (currentToken.category == Category.TERMINAL) {
@@ -1070,7 +1125,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                     doBacktracking(pos)
                 }
             } else {
-                reportError("Falta el identificador")
+                doBacktracking(pos)
             }
         }
         return null
@@ -1148,7 +1203,7 @@ class SyntacticAnalyzer(var tokenList: ArrayList<Token>) {
                     doBacktracking(pos)
                 }
             } else {
-                reportError("Falta el identificador en el casting")
+                doBacktracking(pos)
             }
         }
         return null

@@ -13,4 +13,8 @@ class Decrement (var variableName: Token):Statement(){
         root.children.add(TreeItem("Nombre Variable:${variableName.lexema}"))
         return root;
     }
+    override fun getJavaCode(): String {
+        var code= variableName.getJavaCode()+"--;"
+        return code
+    }
 }

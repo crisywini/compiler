@@ -21,4 +21,17 @@ class Switch (var name:Token, var caseList:ArrayList<Case>):Statement(){
 
         return tree
     }
+
+    override fun getJavaCode(): String {
+        var code="switch ("
+        code+= name.getJavaCode()+ ") {"
+
+        if(caseList.isNotEmpty()) {
+            for (c in caseList) {
+                code += c.getJavaCode()
+            }
+        }
+        code+="}"
+        return code
+    }
 }
